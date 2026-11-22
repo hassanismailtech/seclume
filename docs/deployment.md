@@ -35,6 +35,24 @@ The [Q2 baseline job](https://github.com/hassanismailtech/seclume/actions/runs/4
 
 Local Compose configuration and static configuration tests can run without a Docker daemon; the host-port request and effective binding checks require a running engine. Local Docker is unavailable for this task, so runtime evidence must come from the PR's CI job before networking verification can be claimed. This test does not verify public ingress, DNS, TLS, hosting or deployment.
 
+## External playground smoke script
+
+After an ingress has been deployed and its hostname reviewed, run this from a different network. Replace both example origins with the actual API and website origins:
+
+```sh
+sh scripts/smoke_playground.sh "https://api.example.test" "https://website.example.test"
+```
+
+The script needs POSIX `sh` and curl 8.4 or later, with no jq, Python or other runtime utility. The curl version requirement makes the response-size cap apply even when the server does not advertise a size. See [curl's size-limit documentation](https://curl.se/docs/manpage.html#--max-filesize). HTTPS origins are required except for loopback HTTP tests; credentials, paths, queries and fragments are rejected. A single trailing slash is accepted. The script ignores curl configuration/proxy settings, verifies TLS normally and does not follow redirects. It writes no response files and prints no request/response bodies or supplied argument values.
+
+It prints one PASS/FAIL line for each of five checks: scrubbed JSON and no-store/allowed-origin headers; blocked root/chat routes; disallowed-origin CORS; the twenty-first request's 429/Retry-After; and three forged forwarded-IP values still receiving 429. Any failed check exits 1; invalid arguments or missing/unsupported curl exit 2 before requests. Every HTTP transfer has a five-second connection timeout, ten-second total timeout and 32 KiB body limit; oversized headers/responses are also rejected. Duplicate Content-Type, Date or Retry-After headers and quoted Cache-Control extensions fail validation. Network, TLS and redirect failures do not count as passes.
+
+The only submitted text is the existing synthetic `p01` fixture from `demo/prompts.json`. A bounded shell JSON reader checks its current six-field response contract, requires the PERSON/PHONE/BVN Placeholders, and scans the raw response and decoded string fields for the planted originals, including escaped ASCII and the phone's compact form. It rejects malformed, duplicate-root-field, excessively nested and non-ASCII responses rather than claiming to be a general-purpose JSON utility. Both full and lite mode values are accepted. Successful responses in the rate-limit burst are checked too.
+
+Use a quiet client address with no prior requests in the server's current rate window. The ingress must expose the configured twenty-request fixed-minute limit and coherent HTTP Date headers. Other visitors sharing the same public address can make the quota test fail early. The script counts requests by the server's reported minute, includes the initial successful POST, and restarts the count on a minute change. A rollover during the forged-header check re-establishes the limit before testing all three forged values again. Retries are bounded: at most 64 follow-up requests per burst, two forged-check restarts and 128 scrub POSTs overall. Missing/inconsistent timing or exhausted retry budgets fail the check; they are not interpreted as protection. Rate tests temporarily consume that client address's allowance.
+
+This script targets the restrictive ingress, not the raw Proxy port. Adding it does not deploy a service or establish live DNS/TLS/availability. Its implementation can be tested against a controlled local HTTP harness; a successful real external run must be recorded separately. It does not inspect internal telemetry or storage, and it adds no telemetry behavior. The health-path checks belong to Q4 and are not included here.
+
 ## Before any later launch
 
 - Obtain authorization and an exact commit/image that passes the release gates. Use a host whose location and access controls have been reviewed; never place a real provider key on the public demo host.
