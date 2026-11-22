@@ -6,7 +6,7 @@ const columns = [
   { title: "Product", links: [["Open Source", "/product/open-source"], ["Proxy", "/product/proxy"], ["Scrubber", "/product/scrubber"], ["Wire Tap", "/product/wire-tap"], ["Design partners", "/company/design-partners"]] },
   { title: "Developers", links: [["Quickstart", "/developers/quickstart"], ["Documentation", "/docs"], ["Playground", "/playground"], ["Community", "/developers/community"], ["Changelog", "/company/changelog"]] },
   { title: "Trust", links: [["Architecture", "/trust/architecture"], ["Methodology", "/trust/methodology"], ["Frameworks", "/trust/frameworks"], ["Security", "/trust/security"]] },
-  { title: "Company", links: [["About", "/company/about"], ["Contact", "/company/contact"], ["Press", "/press"], ["Careers", "/company/careers"], ["Sitemap", "/sitemap"]] },
+  { title: "Company", links: [["About", "/company/about"], ["Contact", "/company/contact"], ["Sitemap", "/sitemap"]] },
 ] as const;
 
 const legalLinks = [["Privacy", "/legal/privacy"], ["Terms", "/legal/terms"], ["DPA", "/legal/dpa"], ["Cookies", "/legal/cookies"], ["Acceptable use", "/legal/acceptable-use"], ["License", "/license"]] as const;

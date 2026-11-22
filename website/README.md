@@ -1,4 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Website maintenance notes
+
+## Privacy review
+
+**Draft pending legal review:** the Privacy content in `lib/site-content.ts` describes the supplied website and playground code. This status is recorded here and in a source comment, not rendered on the public page. It is not an approved legal policy. Controller identity, actual hosting/email providers, infrastructure logging and retention, and any required notices must be reviewed against an operator's real deployment before treating it as one.
+
+## Q6 assumptions
+
+- No website input/result persistence is added. Temporary Redis Session Map state, rate-limit counters, optional in-process NER span caches and the existing audit dependency are described separately; there is no blanket claim that nothing is stored.
+- The paused message covers missing API configuration, network/timeout failures and unavailable responses. Input rejection and rate-limit guidance remain distinct. Source and Docker quickstart links remain available.
+- Removed Press and Careers paths have narrowly matched 404 responses in `proxy.ts`: otherwise the catch-all can stream a not-found page with HTTP 200 on its first request. Other routes retain their existing behavior.
+- Performance rows use the Torch “after” column in the benchmark recorded in `NOTES.md` at commit `faabe2e` on 2026-10-28: 100 runs per prompt, Windows demo laptop with 14.9 GB RAM, cold model/cache bypassed. The CPU model and exact measurement time were not recorded. This is a historical layer benchmark, not current end-to-end latency or a new measurement.
+- Decisions stay in this file because Q6 is website-only; root `NOTES.md` is outside its allowlist. No dependency, backend, dashboard or deployment configuration changes are included.
+
+## Development
 
 ## Getting Started
 

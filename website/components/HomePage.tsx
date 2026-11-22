@@ -58,10 +58,14 @@ const steps = [
   },
 ];
 
+const benchmarkSource = `${GITHUB_URL}/blob/faabe2e/NOTES.md#phase-2-task-4-onnx-skip-and-cache`;
 const evidence = [
-  ["Performance", "Measure rule and model overhead on your own hardware", "bench_scrub.py"],
-  ["Leak test", "0 leaks / 35 planted entities across 12 prompts", "test_no_leak.py"],
-  ["Per-type recall and precision (synthetic regression set, project-authored)", "PERSON: 96.9% recall, 61.9% precision", "eval_heldout.py"],
+  ["Rules + gazetteer, 60 words", "p50 0.15 ms / p95 0.25 ms", benchmarkSource, "Benchmark record"],
+  ["Cold GLiNER (Torch), 60 words", "p50 439.2 ms / p95 734.2 ms", benchmarkSource, "Benchmark record"],
+  ["Rules + gazetteer, 500 words", "p50 1.96 ms / p95 4.95 ms", benchmarkSource, "Benchmark record"],
+  ["Cold GLiNER (Torch), 500 words", "p50 4305.4 ms / p95 10476.9 ms", benchmarkSource, "Benchmark record"],
+  ["Leak test", "0 leaks / 35 planted entities across 12 prompts", `${GITHUB_URL}/blob/main/backend/tests/test_no_leak.py`, "Leak test"],
+  ["Per-type recall and precision (synthetic regression set, project-authored)", "PERSON: 96.9% recall, 61.9% precision", `${GITHUB_URL}/blob/main/docs/metrics.txt`, "Quality results"],
 ];
 
 const deploymentOptions = [
@@ -172,7 +176,7 @@ export default function HomePage() {
             <p className="mt-4 max-w-md leading-7 text-foreground">Works with the official OpenAI SDK and Anthropic SDK, including streaming and tool calls.</p><div className="mt-6"><CopyComposeCommand /></div>
           </div>
           <div className="overflow-x-auto rounded-xl bg-background p-5 ring-1 ring-border sm:p-7">
-            <pre className="font-mono text-sm leading-7 text-foreground"><code><span className="text-foreground">from</span> openai <span className="text-foreground">import</span> OpenAI{"\n"}client = OpenAI({"\n"}    base_url=<span className="text-foreground">{`"http://aegis.internal:8000/v1"`}</span>,   <span className="text-muted-foreground"># was https://api.openai.com/v1</span>{"\n"}    api_key=os.environ[<span className="text-foreground">{`"OPENAI_API_KEY"`}</span>],{"\n"})</code></pre>
+            <pre className="font-mono text-sm leading-7 text-foreground"><code><span className="text-foreground">from</span> openai <span className="text-foreground">import</span> OpenAI{"\n"}client = OpenAI({"\n"}    base_url=<span className="text-foreground">{`"http://127.0.0.1:8000/v1"`}</span>,   <span className="text-muted-foreground"># was https://api.openai.com/v1</span>{"\n"}    api_key=os.environ[<span className="text-foreground">{`"OPENAI_API_KEY"`}</span>],{"\n"})</code></pre>
           </div>
         </div>
       </section>
@@ -183,9 +187,10 @@ export default function HomePage() {
           <div className="mt-7 rounded-xl bg-card ring-1 ring-border">
             <Table>
               <TableHeader><TableRow><TableHead>Measure</TableHead><TableHead>Result</TableHead><TableHead>Source</TableHead></TableRow></TableHeader>
-              <TableBody>{evidence.map(([measure, result, source]) => <TableRow key={measure}><TableCell className="font-medium text-foreground">{measure}</TableCell><TableCell className="font-sans tabular-nums text-foreground">{result}</TableCell><TableCell className="font-sans text-xs text-primary"><a href={`${GITHUB_URL}/blob/main/backend/` + (source.startsWith("test_") ? "tests/" : "scripts/") + source} className="hover:underline">{source}</a></TableCell></TableRow>)}</TableBody>
+              <TableBody>{evidence.map(([measure, result, source, label]) => <TableRow key={measure}><TableCell className="font-medium text-foreground">{measure}</TableCell><TableCell className="font-sans tabular-nums text-foreground">{result}</TableCell><TableCell className="font-sans text-xs text-primary"><a href={source} className="hover:underline">{label}</a></TableCell></TableRow>)}</TableBody>
             </Table>
           </div>
+          <p className="mt-5 max-w-3xl text-sm leading-6 text-muted-foreground">Latency record: 2026-10-28, Windows demo laptop, 14.9 GB RAM; CPU model not recorded. Each prompt was measured over 100 runs, with the model cache bypassed. These are layer timings, not end-to-end request latency. The long-prompt model timings exceed the default two-second request budget; those requests can be blocked with HTTP 503. Measure on your own hardware.</p>
           <p className="mt-5 max-w-3xl text-sm leading-6 text-muted-foreground">Results come from our synthetic, project-authored sets, not an independent audit. Deliberate evasion (leetspeak, spelled-out digits) is a known limitation. <Link href="/trust/methodology" className="text-primary underline-offset-4 hover:underline">Read the methodology.</Link></p>
         </div>
       </section>

@@ -283,17 +283,12 @@ export function GlobalNav() {
                 Docs
               </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink render={<Link href="/pricing" />} className="px-2.5 py-1.5 text-foreground hover:bg-muted hover:text-foreground">
-                Pricing
-              </NavigationMenuLink>
-            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
         <div className="flex items-center gap-2"><ThemeToggle /><div className="hidden items-center gap-2 lg:flex">
           {dashboardUrl && <Button variant="ghost" render={<a href={dashboardUrl} />} className="text-foreground hover:bg-muted hover:text-foreground">Dashboard</Button>}
-          <Button variant="outline" render={<Link href="/pricing" />} className="border-border bg-card text-foreground hover:bg-muted">
+          <Button variant="outline" render={<Link href="/company/design-partners" />} className="border-border bg-card text-foreground hover:bg-muted">
             Design partners
           </Button>
           <Button render={<Link href="/playground" />} className="bg-primary text-primary-foreground hover:bg-primary">
@@ -320,7 +315,6 @@ export function GlobalNav() {
               <MobileLink href="/company">Company</MobileLink>
               {companyLinks.map((link) => <MobileLink key={link.href} href={link.href}>{link.title}</MobileLink>)}
               <MobileLink href="/docs">Docs</MobileLink>
-              <MobileLink href="/pricing">Pricing</MobileLink>
               <MobileLink href="/playground">Playground</MobileLink>
               {dashboardUrl && <SheetClose render={<a href={dashboardUrl} />} className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors duration-150 ease-in-out hover:bg-muted hover:text-primary">Dashboard</SheetClose>}
             </nav>
