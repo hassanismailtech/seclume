@@ -4,7 +4,7 @@ An open-source Python PII-minimisation Proxy for AI agents handling Nigerian ide
 
 Maintained by [Hassan Ismail (hassanismailtech)](https://github.com/hassanismailtech). Canonical source: [hassanismailtech/seclume](https://github.com/hassanismailtech/seclume).
 
-This Python project is independently maintained and is not affiliated with the Java [`space.seclume` project](https://github.com/Seclume/seclume).
+This Python project is independently maintained and is not affiliated with the Java [`seclume.space` project](https://github.com/Seclume/seclume).
 
 Seclume is an OpenAI- and Anthropic-compatible Proxy. Its Scrubber replaces detected sensitive values with session-stable Placeholders before a request reaches an external Upstream, and its Reinjector restores known values only in the response returned to the caller. Wire Tap and telemetry make the post-scrub boundary reviewable. Seclume reduces leakage exposure; detection has limits, and Seclume does not make a transfer lawful.
 
@@ -299,7 +299,7 @@ Submit changes through Pull Requests and review passing <code>ci</code> and <cod
 
 Report privately to [security@seclume.tech](mailto:security@seclume.tech) or through [GitHub private security advisories](https://github.com/hassanismailtech/seclume/security/advisories/new); use synthetic reproduction data only. General/design-partner inquiries: [hello@seclume.tech](mailto:hello@seclume.tech). Privacy inquiries: [privacy@seclume.tech](mailto:privacy@seclume.tech). See [SECURITY.md](SECURITY.md) for scope and disclosure guidance.
 
-The Session Map uses temporary Redis state and the supplied Compose configuration disables Redis persistence. Existing SQLite audit metadata is separate, and its unkeyed hash chain is not resistant to an administrator rewriting it. Seclume measures detector behaviour rather than promising latency; results depend on workload, runtime, hardware and cache state. Review [docs/metrics.txt](docs/metrics.txt), [docs/limitations.md](docs/limitations.md) and [docs/CLAIMS.md](docs/CLAIMS.md) before publishing performance or quality claims.
+The Session Map uses temporary Redis state, and the supplied Compose configuration disables Redis persistence. Existing SQLite audit metadata is separate, and its unkeyed hash chain is not resistant to an administrator rewriting it. Seclume measures detector behaviour rather than promising latency; results depend on workload, runtime, hardware and cache state. Review [docs/metrics.txt](docs/metrics.txt), [docs/limitations.md](docs/limitations.md) and [docs/CLAIMS.md](docs/CLAIMS.md) before publishing performance or quality claims.
 
 ## License and authors
 
