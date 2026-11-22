@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { BRAND_NAME } from "@/lib/brand.mjs";
+import { PRODUCT_NAME } from "@/lib/brand.mjs";
 import "./globals.css";
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} | Data boundary control plane`,
+  title: `${PRODUCT_NAME} | Data boundary control plane`,
   description:
     "See exactly what crossed your model boundary, post-scrub.",
 };

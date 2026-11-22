@@ -2,6 +2,22 @@
 
 ## ASSUMPTIONS
 
+### Identity clarification before Q8 (2026-11-22)
+
+- The user approved a small identity pass after reporting Google search confusion with the unrelated Java project. Use `codex/identity-clarification` from clean origin/main 34eedc0 (merged Q7). Seclume remains the umbrella brand and Seclume Proxy is the descriptive product identity. No incorporation, trademark clearance or search-ranking outcome is asserted; Q8/Q9 remain unstarted.
+- Keep `BRAND_NAME` as Seclume and add a derived `PRODUCT_NAME` in the existing independent app brand modules. Reuse one website product description in metadata and visible home/footer text. Website title templates/Open Graph and dashboard title identify the product without renaming compatibility identifiers, repository, domain or confirmed mailboxes. No new setting, dependency, route, tracking or structured-data scheme is added.
+- Lead the README with the product description, maintainer and canonical source. Move the original Aegis name to a compatibility/history section and include the approved, factual non-affiliation note in the README only. Update the claims register in the same change.
+- The profile README is a separate repository, `hassanismailtech/hassanismailtech`. The user approved its narrowly scoped correction in a separate branch/PR: update only its Selected Work entry and hackathon reference. Use the new local checkout at `C:/Users/Hassan Ismail/Dev/hassanismailtech`, branch `codex/seclume-proxy-identity`; leave biography, other projects, account/repository settings, domains and mail untouched.
+- Both changes get DCO-signed commits and draft PRs. No merge, manual publication, workflow dispatch, account setting change, search-console action or request for reindexing is included. Prepared source/PR changes do not establish that the live site or search results have updated. Stop after this identity phase before implementing Q8.
+
+### Identity clarification: local verification
+
+- `npm --prefix website test`: 44 tests passed, 0 failed/skipped. `node --test frontend/tests/brand.test.mjs`: 2 tests passed, 0 failed/skipped. Existing Node module-type warnings remain; dependency manifests and locks are unchanged.
+- Both app lint commands exited 0. Both production builds exited 0: website generated 72/72 static pages; dashboard generated 3/3. `node --experimental-strip-types --test website/tests/brand-build.test.mjs`: 2 passed, 0 failed/skipped, checking product titles, Open Graph names/descriptions, visible home/footer description, canonical origins, configured contacts and the dashboard return link against production servers.
+- Claims lint passed. A temporary integrity check validated 40 README local links/anchors and the exact 15-file project scope. It compared the entire profile README with its base and confirmed only the two intended project lines changed. The profile checkout's Windows line endings were normalized before staging so its diff remains two additions/two deletions, not a whole-file rewrite.
+- Production browser inspection confirmed the home identity at desktop and 390 px mobile. The mobile footer's content width equalled its available width (375 px), with no horizontal overflow there. Temporary browser/server state was cleaned up; no public deployment or search result was tested.
+- Profile change: DCO-signed commit `645c70b76d3e47c5d0542e1e62eb21977903833f`, draft PR https://github.com/hassanismailtech/hassanismailtech/pull/1. Only README.md changed; biography and other projects remain unchanged. Project CI and any profile checks must be reported for their actual commits rather than inferred from a push.
+
 ### Q7: reviewer on-ramp and contribution drafts (2026-11-22)
 
 - The user approved the Q7 plan. Work on `codex/q7-reviewer-onramp` from clean origin/main b2ed898 (merged Q6). Scope is README links, two reviewer/contribution documents and these notes. No runtime, website, dashboard, workflow, dependency, PRD or LICENSE change is included; stop before Q8.

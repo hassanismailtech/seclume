@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { BRAND_NAME, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
+import { BRAND_NAME, PRODUCT_NAME, PRODUCT_DESCRIPTION, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
 import { contacts } from "../lib/contacts.mjs";
 import { spawnSync } from "node:child_process";
 import { GET } from "../app/.well-known/security.txt/route.ts";
@@ -56,6 +56,26 @@ const removedPaths = [
   "product/cloud/support", "trust/status", "trust/dpia-pack", "company/careers", "press",
 ];
 const read = path => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+
+test("the product has a descriptive identity while brand, source and compatibility history remain distinct", async () => {
+  assert.equal(BRAND_NAME, "Seclume");
+  assert.equal(PRODUCT_NAME, "Seclume Proxy");
+  for (const detail of ["Python", "PII-minimisation", "AI agents", "Nigerian identifiers", "OpenAI- and Anthropic-compatible", "self-hosted"]) assert.ok(PRODUCT_DESCRIPTION.includes(detail), detail);
+  const readme = await readFile(new URL("../../README.md", import.meta.url), "utf8");
+  const introduction = readme.split("## Visit the public website")[0];
+  assert.ok(introduction.startsWith(`# ${PRODUCT_NAME} — PII boundary for AI agents\n`));
+  assert.ok(introduction.includes(PRODUCT_DESCRIPTION));
+  assert.ok(introduction.includes(GITHUB_URL));
+  assert.ok(introduction.includes("Hassan Ismail (hassanismailtech)"));
+  assert.ok(introduction.includes("not affiliated with the Java"));
+  assert.equal(introduction.includes("Aegis"), false);
+  assert.match(readme, /## Compatibility and project history[\s\S]*originally named Aegis/);
+  for (const file of ["components/HomePage.tsx", "components/SiteFooter.tsx", "app/layout.tsx", "app/(marketing)/page.tsx"]) {
+    const source = await read(file);
+    assert.ok(source.includes("PRODUCT_NAME"), file);
+    assert.ok(source.includes("PRODUCT_DESCRIPTION"), file);
+  }
+});
 
 test("unshipped roadmap routes are absent from the page registry and sitemap paths", () => {
   for (const path of removedPaths) {

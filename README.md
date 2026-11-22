@@ -1,8 +1,10 @@
-# Seclume
+# Seclume Proxy — PII boundary for AI agents
 
-Formerly Aegis. The public name is Seclume; existing `AEGIS_*` settings, `X-Aegis-*` headers, the `aegis` CLI/package, Redis prefixes and local image default remain unchanged.
+An open-source Python PII-minimisation Proxy for AI agents handling Nigerian identifiers. OpenAI- and Anthropic-compatible; self-hosted.
 
-> An inspectable data boundary for AI agents handling Nigerian identifiers.
+Maintained by [Hassan Ismail (hassanismailtech)](https://github.com/hassanismailtech). Canonical source: [hassanismailtech/seclume](https://github.com/hassanismailtech/seclume).
+
+This Python project is independently maintained and is not affiliated with the Java [`seclume.space` project](https://github.com/Seclume/seclume).
 
 Seclume is an OpenAI- and Anthropic-compatible Proxy. Its Scrubber replaces detected sensitive values with session-stable Placeholders before a request reaches an external Upstream, and its Reinjector restores known values only in the response returned to the caller. Wire Tap and telemetry make the post-scrub boundary reviewable. Seclume reduces leakage exposure; detection has limits, and Seclume does not make a transfer lawful.
 
@@ -10,7 +12,7 @@ Seclume is an OpenAI- and Anthropic-compatible Proxy. Its Scrubber replaces dete
 
 [Visit Seclume on the web →](https://seclume.tech)
 
-The public name remains Seclume. Website and dashboard site links use `NEXT_PUBLIC_SITE_URL` (default `https://seclume.tech`); website contact settings default to the confirmed security, hello and privacy mailboxes. See [public identity configuration](docs/configuration.md#public-identity-and-contacts) before changing a domain or contact address. Rebuild and redeploy the apps after changing their settings; repository Markdown and GitHub URLs are maintained separately.
+The umbrella brand remains Seclume; this product is Seclume Proxy. Website and dashboard site links use `NEXT_PUBLIC_SITE_URL` (default `https://seclume.tech`); website contact settings default to the confirmed security, hello and privacy mailboxes. See [public identity configuration](docs/configuration.md#public-identity-and-contacts) before changing a domain or contact address. Rebuild and redeploy the apps after changing their settings; repository Markdown and GitHub URLs are maintained separately.
 
 [![CI](https://github.com/hassanismailtech/seclume/actions/workflows/ci.yml/badge.svg)](https://github.com/hassanismailtech/seclume/actions/workflows/ci.yml)
 [![Evaluation](https://github.com/hassanismailtech/seclume/actions/workflows/eval.yml/badge.svg)](https://github.com/hassanismailtech/seclume/actions/workflows/eval.yml)
@@ -22,6 +24,7 @@ The public name remains Seclume. Website and dashboard site links use `NEXT_PUBL
 
 - [Key features](#key-features)
 - [Current scope](#current-scope)
+- [Compatibility and project history](#compatibility-and-project-history)
 - [Architecture and system design](#architecture-and-system-design)
 - [Getting started](#getting-started)
 - [Local playground](#local-playground)
@@ -51,6 +54,10 @@ The public name remains Seclume. Website and dashboard site links use `NEXT_PUBL
 The self-hosted Proxy and dashboard are implemented. The playground API and page are implemented but require explicit backend and browser configuration; a working marketing site alone does not establish a working public API. Use synthetic inputs only.
 
 The planned release remains [Unreleased](CHANGELOG.md#unreleased). The [release checklist](docs/release-checklist.md) and [public playground deployment guide](docs/deployment.md) distinguish prepared configuration from verified release images, hosting and external-network checks. The visual brand update is still in progress.
+
+## Compatibility and project history
+
+This project was originally named Aegis. Seclume Proxy is its current public product name. Existing `AEGIS_*` settings, `X-Aegis-*` headers, the `aegis` CLI/package, Redis prefixes and local image default remain unchanged. Seclume is the umbrella brand.
 
 ## Architecture and system design
 
@@ -292,7 +299,7 @@ Submit changes through Pull Requests and review passing <code>ci</code> and <cod
 
 Report privately to [security@seclume.tech](mailto:security@seclume.tech) or through [GitHub private security advisories](https://github.com/hassanismailtech/seclume/security/advisories/new); use synthetic reproduction data only. General/design-partner inquiries: [hello@seclume.tech](mailto:hello@seclume.tech). Privacy inquiries: [privacy@seclume.tech](mailto:privacy@seclume.tech). See [SECURITY.md](SECURITY.md) for scope and disclosure guidance.
 
-The Session Map uses temporary Redis state and the supplied Compose configuration disables Redis persistence. Existing SQLite audit metadata is separate, and its unkeyed hash chain is not resistant to an administrator rewriting it. Seclume measures detector behaviour rather than promising latency; results depend on workload, runtime, hardware and cache state. Review [docs/metrics.txt](docs/metrics.txt), [docs/limitations.md](docs/limitations.md) and [docs/CLAIMS.md](docs/CLAIMS.md) before publishing performance or quality claims.
+The Session Map uses temporary Redis state, and the supplied Compose configuration disables Redis persistence. Existing SQLite audit metadata is separate, and its unkeyed hash chain is not resistant to an administrator rewriting it. Seclume measures detector behaviour rather than promising latency; results depend on workload, runtime, hardware and cache state. Review [docs/metrics.txt](docs/metrics.txt), [docs/limitations.md](docs/limitations.md) and [docs/CLAIMS.md](docs/CLAIMS.md) before publishing performance or quality claims.
 
 ## License and authors
 

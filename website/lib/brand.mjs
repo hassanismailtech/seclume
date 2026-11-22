@@ -1,4 +1,6 @@
 export const BRAND_NAME = "Seclume";
+export const PRODUCT_NAME = `${BRAND_NAME} Proxy`;
+export const PRODUCT_DESCRIPTION = "An open-source Python PII-minimisation Proxy for AI agents handling Nigerian identifiers. OpenAI- and Anthropic-compatible; self-hosted.";
 export const GITHUB_URL = "https://github.com/hassanismailtech/seclume";
 
 export function siteUrl(value = process.env.NEXT_PUBLIC_SITE_URL) {

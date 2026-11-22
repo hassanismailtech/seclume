@@ -1,6 +1,6 @@
 "use client";
 
-import { BRAND_NAME, GITHUB_URL } from "@/lib/brand.mjs";
+import { BRAND_NAME, PRODUCT_NAME, PRODUCT_DESCRIPTION, GITHUB_URL } from "@/lib/brand.mjs";
 
 import Link from "next/link";
 import {
@@ -92,11 +92,13 @@ function CopyComposeCommand() {
 export default function HomePage() {
   return (
     <main id="main-content" className="landing-page">
-      <section className="hero-section relative isolate overflow-hidden px-4 pb-24 pt-24 sm:px-6 lg:pb-32 lg:pt-32">        <div className="mx-auto max-w-[1120px] text-left">          <h1 className="hero-title mt-6">
+      <section className="hero-section relative isolate overflow-hidden px-4 pb-24 pt-24 sm:px-6 lg:pb-32 lg:pt-32">        <div className="mx-auto max-w-[1120px] text-left">
+          <p className="font-mono text-sm text-primary">{PRODUCT_NAME}</p>
+          <h1 className="hero-title mt-6">
             A data boundary for AI agents.
           </h1>
           <p className="hero-description mt-6 text-muted-foreground">
-            An OpenAI- and Anthropic-compatible Proxy that replaces detected Nigerian identifiers with Placeholders before an external model call.
+            {PRODUCT_DESCRIPTION}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button render={<Link href="/playground" />} className="h-11 bg-primary px-5 text-primary-foreground hover:bg-primary">Try the playground</Button>
