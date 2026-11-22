@@ -1,5 +1,6 @@
 // Keep the display name aligned with website/lib/brand.mjs. Protocol identifiers stay unchanged.
 export const BRAND_NAME = "Seclume";
+export const PRODUCT_NAME = `${BRAND_NAME} Proxy`;
 export const GITHUB_URL = "https://github.com/hassanismailtech/seclume";
 
 export function siteUrl(value = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_MARKETING_URL) {

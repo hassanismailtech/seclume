@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 import { once } from "node:events";
 import test from "node:test";
 import { setTimeout } from "node:timers/promises";
-import { BRAND_NAME, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
+import { BRAND_NAME, PRODUCT_NAME, PRODUCT_DESCRIPTION, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
 import { contacts } from "../lib/contacts.mjs";
 import { siteUrl as dashboardSiteUrl } from "../../frontend/lib/brand.mjs";
 
@@ -30,6 +30,17 @@ test("built website uses configured origins and contacts across public routes", 
     assert.equal(response.status, 200, path);
     const html = await response.text();
     assert.ok(html.includes(BRAND_NAME), path);
+    assert.ok(html.includes('<title>') && html.match(/<title>([^<]+)<\/title>/)[1].includes(PRODUCT_NAME), `product title ${path}`);
+    const ogTitle = html.match(/<meta property="og:title" content="([^"]+)"/);
+    assert.ok(ogTitle && ogTitle[1].includes(PRODUCT_NAME), `product Open Graph title ${path}`);
+    assert.ok(html.includes(`<meta property="og:site_name" content="${PRODUCT_NAME}"`), path);
+    if (path === "/") {
+      assert.ok(html.includes(`<meta name="description" content="${PRODUCT_DESCRIPTION}"`));
+      assert.ok(html.includes(`<meta property="og:description" content="${PRODUCT_DESCRIPTION}"`));
+      const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "");
+      assert.ok(visible.includes(PRODUCT_NAME));
+      assert.ok(visible.includes(PRODUCT_DESCRIPTION));
+    }
     const canonical = html.match(/<link rel="canonical" href="([^"]+)"/);
     const og = html.match(/<meta property="og:url" content="([^"]+)"/);
     assert.ok(canonical, `canonical ${path}`);
@@ -59,7 +70,7 @@ test("built website uses configured origins and contacts across public routes", 
 test("built dashboard displays the current brand and configured return link", async t => {
   const base = await serve(t, "../../frontend/", 3312);
   const html = await (await fetch(base)).text();
-  assert.ok(html.includes(`<title>${BRAND_NAME} | Data boundary control plane</title>`));
+  assert.ok(html.includes(`<title>${PRODUCT_NAME} | Data boundary control plane</title>`));
   assert.ok(html.includes(`href="${dashboardSiteUrl()}"`));
   assert.ok(html.replace(/<[^>]*>/g, "").includes(`${BRAND_NAME} site`));
   assert.equal(html.includes("Aegis site"), false);

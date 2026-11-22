@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { themeBootstrap } from "@/lib/theme";
-import { BRAND_NAME, siteUrl } from "@/lib/brand.mjs";
+import { PRODUCT_NAME, PRODUCT_DESCRIPTION, siteUrl } from "@/lib/brand.mjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,15 +17,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: `${BRAND_NAME} — a data boundary for AI agents`,
-    template: `%s | ${BRAND_NAME}`,
+    default: `${PRODUCT_NAME} — PII boundary for AI agents`,
+    template: `%s | ${PRODUCT_NAME}`,
   },
-  description: "A data boundary for AI systems.",
+  description: PRODUCT_DESCRIPTION,
   openGraph: {
     type: "website",
-    siteName: BRAND_NAME,
-    title: `${BRAND_NAME} — a data boundary for AI agents`,
-    description: "A data boundary for AI systems.",
+    siteName: PRODUCT_NAME,
+    title: `${PRODUCT_NAME} — PII boundary for AI agents`,
+    description: PRODUCT_DESCRIPTION,
   },
 };
 

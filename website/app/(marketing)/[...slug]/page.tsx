@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { BRAND_NAME } from "@/lib/brand.mjs";
+import { PRODUCT_NAME } from "@/lib/brand.mjs";
 
 import { MarketingPage } from "@/components/MarketingPage";
 import { marketingPaths, sitePages } from "@/lib/site-content";
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/[...slug]">): Pro
     title: page.title,
     description: page.description,
     alternates: { canonical: `/${path}` },
-    openGraph: { type: "website", siteName: BRAND_NAME, title: `${page.title} | ${BRAND_NAME}`, description: page.description, url: `/${path}` },
+    openGraph: { type: "website", siteName: PRODUCT_NAME, title: `${page.title} | ${PRODUCT_NAME}`, description: page.description, url: `/${path}` },
   };
 }
 

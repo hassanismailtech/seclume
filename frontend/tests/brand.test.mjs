@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { BRAND_NAME, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
+import { BRAND_NAME, PRODUCT_NAME, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
 import * as website from "../../website/lib/brand.mjs";
 
 test("independently built apps agree on public identity and origin validation", () => {
   assert.equal(BRAND_NAME, website.BRAND_NAME);
+  assert.equal(PRODUCT_NAME, "Seclume Proxy");
+  assert.equal(PRODUCT_NAME, website.PRODUCT_NAME);
   assert.equal(GITHUB_URL, website.GITHUB_URL);
   for (const value of ["", "https://alternate.example.test/path?query=ignored#fragment", "http://localhost:3000", "http://127.0.0.1:3001", "http://[::1]:3002"]) {
     assert.equal(siteUrl(value), website.siteUrl(value));
