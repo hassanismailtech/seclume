@@ -153,6 +153,7 @@ The local development stack is not the public hosting configuration. Follow the 
 
 ## Operating guides
 
+- [Review in ten minutes](docs/review-in-10-minutes.md): playground, three test commands, threat model, limits and safe review probes.
 - [Local quickstart](docs/quickstart.md): Compose, a synthetic chat-client check, dashboard inspection and cleanup.
 - [Configuration](docs/configuration.md): complete Python defaults, working-directory behavior, Compose overrides and public browser settings.
 - [Security model](docs/security-model.md): trust boundary, attacker capabilities, existing controls and remaining risks.
@@ -275,6 +276,8 @@ The no-leak tests assert that the project’s synthetic planted values do not ap
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and [docs/CLAIMS.md](docs/CLAIMS.md) before opening a change.
+
+Start with the [reviewer guide](docs/review-in-10-minutes.md) or the [three good-first-issue drafts](docs/good-first-issues.md). The drafts are proposed work, not shipped capabilities or GitHub issues created by this repository.
 
 - Work from a short-lived <code>feat/</code>, <code>fix/</code>, <code>docs/</code>, or <code>chore/</code> branch.
 - Use Conventional Commits and follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit requirements. A <code>-s</code> sign-off is distinct from cryptographic commit signing.

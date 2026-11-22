@@ -2,6 +2,21 @@
 
 ## ASSUMPTIONS
 
+### Q7: reviewer on-ramp and contribution drafts (2026-11-22)
+
+- The user approved the Q7 plan. Work on `codex/q7-reviewer-onramp` from clean origin/main b2ed898 (merged Q6). Scope is README links, two reviewer/contribution documents and these notes. No runtime, website, dashboard, workflow, dependency, PRD or LICENSE change is included; stop before Q8.
+- The ten-minute guide is a review agenda after setup, not a dependency-install/model-download or full-integration timing claim. It presents exactly three test commands: focused startup tests excluding only the explicitly named real-Redis case, website tests, and the complete backend suite. It names real Redis, verified Caddy and model prerequisites; the focused run is not full verification.
+- The playground entry includes its paused fallback and local instructions, without claiming current public API availability. Review probes are for an isolated local stack or existing tests, use existing synthetic fixtures, and direct security reports to the established private channel. Existing audit metadata and NER caches are distinct from ephemeral Redis Session Map state.
+- The three issue drafts propose a strictly opt-in Ghana international PHONE pack, a self-contained SDK snippet documentation fix, and cold-start built-site HTTP regression tests. They do not implement these changes or create issues. The pack draft cites NCA and ITU sources reviewed on 2026-11-22 and requires a current-source recheck and maintainer-approved synthetic fixtures before implementation; it makes no assigned-number or quality claim.
+- Use a DCO sign-off for the Q7 commit per CONTRIBUTING.md and the existing public noreply author address without changing global Git/account settings. The user authorized the task-branch push and PR; no merge, tag, publish, workflow dispatch, deployment or account operation is authorized here.
+
+### Q7 local verification
+
+- `uv run --directory backend pytest -q tests/test_startup_guard.py -k "not real_redis"`: `23 passed, 1 deselected in 32.80s`. The deselected case is the mandatory real-Redis lifespan test; no full-integration success is claimed locally under the existing CI-only Redis strategy.
+- `npm --prefix website test`: 43 tests, 43 passed, 0 failed, 0 skipped; duration 12529.7782 ms. Existing Node module-type warnings remain. No website implementation or dependency change is included.
+- `uv run --directory backend python scripts/claims_lint.py`: `Claims lint passed.` The temporary UTF-8 documentation validator passed 69 local Markdown links, including 20 heading anchors, checked the exact three test commands against existing files/scripts, confirmed the three scoped drafts and their referenced gaps, and checked the four-file documentation-only scope. Its initial Windows-default decoding failure was fixed in the temporary helper, without a repository code change.
+- The complete backend suite, real Redis/Caddy checks, web builds and container checks remain CI verification for the PR commit. No new runtime module is introduced and no live API/hosting check or issue creation was performed. CI results belong in the phase report/PR rather than being inferred from a branch push.
+
 ### Q1: configurable public identity (2026-11-22)
 
 - The user approved Q1's plan and requested a commit and PR after every queue item where possible. Use `codex/q1-brand-config` from clean origin/main fc4ecea. Q2-Q9 remain queued; no Compose, ingress, container, backend, publishing, account or hosting changes are included here.
