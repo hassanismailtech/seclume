@@ -23,6 +23,16 @@ caddy validate --envfile deploy/.env --config deploy/Caddyfile --adapter caddyfi
 
 The container image must already exist or be built using the README's `SECLUME_IMAGE` instructions. Validation alone does not prove networking, health, DNS or TLS. The CI profile uses native Redis plus verified Caddy for tests, and separately starts the isolated Compose stack for a real synthetic scrub request. Unexecuted CI remains unverified.
 
+## Host-port networking verification
+
+The `playground-networking` CI job checks the standalone profile from the Ubuntu runner host. Unlike the existing in-container request, it sends a bounded curl POST through `http://127.0.0.1:8000/v1/playground/scrub`, using the existing synthetic `p01` fixture. It requires HTTP 200, lite-mode JSON with Placeholders, no planted originals anywhere in the response, and no playground Telemetry Events. Request text and response bodies are not printed in the job output.
+
+The job builds the existing runtime target under `SECLUME_IMAGE`, records Docker/Compose versions, validates the profile, waits for container health and always removes its test stack. It checks both configured and effective Proxy port bindings, verifies Redis has no published bindings and joins only the private network, and requires the host's `127.0.0.1:6379` to refuse connections. Test ports must be free before startup so an unrelated service cannot satisfy a probe. This checks host loopback publishing, not isolation from a host administrator accessing container addresses directly.
+
+Q2 first tests the current topology: both services use only the `private` network with `internal: true`. The current container health/in-container checks do not establish host-port reachability. Keep this topology if the host check passes; add a default network to the Proxy only if runtime evidence shows the internal-only topology prevents access. Redis remains exclusively on the private network with no published port, persistence or volume.
+
+Local Compose configuration and static configuration tests can run without a Docker daemon; the host-port request and effective binding checks require a running engine. Local Docker is unavailable for this task, so runtime evidence must come from the PR's CI job before networking verification can be claimed. This test does not verify public ingress, DNS, TLS, hosting or deployment.
+
 ## Before any later launch
 
 - Obtain authorization and an exact commit/image that passes the release gates. Use a host whose location and access controls have been reviewed; never place a real provider key on the public demo host.
