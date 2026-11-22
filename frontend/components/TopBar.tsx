@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND_NAME, siteUrl } from "@/lib/brand.mjs";
+
 import { Activity, ArrowLeft, ShieldCheck, Wifi, WifiOff } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +14,7 @@ type TopBarProps = {
 };
 
 export function TopBar({ stats, connection }: TopBarProps) {
-  const marketingUrl = process.env.NEXT_PUBLIC_MARKETING_URL;
+  const marketingUrl = siteUrl();
   const leakLabel = stats.leaks
     ? `${stats.leaks.leaks} / ${stats.leaks.planted}`
     : "not run";
@@ -25,7 +27,7 @@ export function TopBar({ stats, connection }: TopBarProps) {
             <ShieldCheck className="size-5" />
           </div>
           <div>
-            <p className="text-base font-semibold tracking-tight">Aegis</p>
+            <p className="text-base font-semibold tracking-tight">{BRAND_NAME}</p>
             <p className="text-[11px] text-muted-foreground">Data boundary control plane</p>
           </div>
           <Badge variant="outline" className="ml-2 gap-1.5 border-emerald-400/30 bg-emerald-400/5 text-emerald-300">
@@ -33,7 +35,7 @@ export function TopBar({ stats, connection }: TopBarProps) {
             {connection === "live" ? "Telemetry live" : connection === "connecting" ? "Connecting" : "Reconnecting"}
           </Badge>
           <span className="hidden items-center gap-1.5 text-xs text-muted-foreground lg:flex"><Activity className="size-3.5" /> OpenAI-compatible proxy</span>
-          {marketingUrl && <a href={marketingUrl} className="ml-auto hidden items-center gap-1.5 text-xs text-cyan-300 transition-colors duration-150 ease-in-out hover:text-cyan-200 md:inline-flex"><ArrowLeft className="size-3.5" /> Aegis site</a>}
+          {marketingUrl && <a href={marketingUrl} className="ml-auto hidden items-center gap-1.5 text-xs text-cyan-300 transition-colors duration-150 ease-in-out hover:text-cyan-200 md:inline-flex"><ArrowLeft className="size-3.5" /> {BRAND_NAME} site</a>}
         </div>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           <Metric label="Entities scrubbed" value={stats.entities_total.toLocaleString()} hint="all types" />

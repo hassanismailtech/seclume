@@ -1,13 +1,11 @@
+import { GITHUB_URL, siteUrl } from "../../../lib/brand.mjs";
+import { contacts } from "../../../lib/contacts.mjs";
+
 export function GET() {
-  let canonical = "";
-  try {
-    const url = new URL("/.well-known/security.txt", process.env.NEXT_PUBLIC_SITE_URL);
-    if (url.protocol === "https:" && !url.username && !url.password) canonical = `Canonical: ${url.href}\n`;
-  } catch {
-    // No verified site origin is configured; do not advertise an invented URL.
-  }
+  const origin = siteUrl();
+  const canonical = origin.startsWith("https:") ? `Canonical: ${origin}/.well-known/security.txt\n` : "";
   return new Response(
-    "Contact: mailto:security@seclume.tech\nContact: https://github.com/hassanismailtech/seclume/security/advisories/new\nExpires: 2027-11-18T00:00:00.000Z\nPolicy: https://github.com/hassanismailtech/seclume/security/policy\nPreferred-Languages: en\n" + canonical,
+    `Contact: mailto:${contacts().security}\nContact: ${GITHUB_URL}/security/advisories/new\nExpires: 2027-11-18T00:00:00.000Z\nPolicy: ${GITHUB_URL}/security/policy\nPreferred-Languages: en\n${canonical}`,
     { headers: { "Content-Type": "text/plain; charset=utf-8" } },
   );
 }

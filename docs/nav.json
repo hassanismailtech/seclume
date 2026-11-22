@@ -249,7 +249,7 @@
             {
               "title": "API Reference",
               "href": "/docs/api",
-              "description": "Proxy and Aegis operational routes."
+              "description": "Proxy and Seclume operational routes."
             },
             {
               "title": "Entity types",
@@ -321,7 +321,7 @@
               "description": "Post-scrub proof of Upstream traffic."
             },
             {
-              "title": "What Aegis does not do",
+              "title": "What Seclume does not do",
               "href": "/trust/limitations",
               "description": "Non-goals and honest limitations."
             },

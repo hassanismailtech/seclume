@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand.mjs";
 import type {
   SeedResponse,
   Stats,
@@ -20,7 +21,7 @@ async function getJson<T>(path: string): Promise<T> {
     headers: aegisHeaders(),
   });
   if (!response.ok) {
-    throw new Error(`Aegis ${path} returned ${response.status}`);
+    throw new Error(`${BRAND_NAME} ${path} returned ${response.status}`);
   }
   return (await response.json()) as T;
 }
@@ -42,7 +43,7 @@ export async function fetchTicket(): Promise<string> {
     headers: aegisHeaders(),
   });
   if (!response.ok) {
-    throw new Error(`Aegis ticket returned ${response.status}`);
+    throw new Error(`${BRAND_NAME} ticket returned ${response.status}`);
   }
   return ((await response.json()) as TicketResponse).ticket;
 }
@@ -53,7 +54,7 @@ export async function seedDemoData(): Promise<SeedResponse> {
     headers: aegisHeaders(),
   });
   if (!response.ok) {
-    throw new Error(`Aegis seed returned ${response.status}`);
+    throw new Error(`${BRAND_NAME} seed returned ${response.status}`);
   }
   return (await response.json()) as SeedResponse;
 }

@@ -1,4 +1,4 @@
-# Aegis design system v2 (landing + dashboard)
+# Seclume design system v2 (landing + dashboard)
 
 Feeling: calm, exact, trustworthy. A DPO and an engineer should both feel "this tells me the truth". Evidence over decoration.
 
@@ -47,7 +47,7 @@ Badge (status: ok, state_loss, scrub_blocked, upstream_error, each with icon and
 - **Auth state:** a small "Token required" screen instead of a broken UI when the demo token is wrong.
 
 ## 7. Landing layout
-Hero (headline, `docker compose up` with copy button, diff visual), Problem (3 facts), How it works (3 steps with the ASCII or SVG core loop), Integration (code), Evidence (table plus link to methodology), Evidence-for-DPO block, Deploy block (VPC / on-prem / Nigeria-hosted), "What Aegis does not do", Design-partner CTA, enterprise-security checklist row, footer. Docs on a separate route (Markdown, search, versioned).
+Hero (headline, `docker compose up` with copy button, diff visual), Problem (3 facts), How it works (3 steps with the ASCII or SVG core loop), Integration (code), Evidence (table plus link to methodology), Evidence-for-DPO block, Deploy block (VPC / on-prem / Nigeria-hosted), "What Seclume does not do", Design-partner CTA, enterprise-security checklist row, footer. Docs on a separate route (Markdown, search, versioned).
 
 ## 8. Motion and imagery
 150 ms ease-in-out on hover and feed insertion; no looping animation on data. One abstract topographic or particle graphic at most. No stock photos, no stolen screenshots, no logos you do not have permission to show.

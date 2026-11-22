@@ -46,3 +46,22 @@ Compose reads its explicit [environment mapping](../docker-compose.yml), not eve
 The website's public build settings are documented in [its environment example](../website/.env.example). `NEXT_PUBLIC_PLAYGROUND_API` is a public API base URL, not a secret. `NEXT_PUBLIC_SITE_URL` is the verified HTTPS site origin. Cross-origin retry countdowns require ingress to expose `Retry-After`; otherwise the website uses a generic wait message. Backend CORS configuration alone does not expose that response header.
 
 For authenticated API calls, use `Authorization: Bearer` for the tenant key. Supply a separate provider credential using `UPSTREAM_API_KEY`, OpenAI `X-Upstream-Authorization`, or Anthropic `X-Upstream-Api-Key`; do not put tenant credentials in browser-visible `NEXT_PUBLIC_*` settings. Review the [security model](security-model.md) before deployment.
+
+## Public identity and contacts
+
+The public name remains Seclume. Each independently built app has a small `lib/brand.mjs` module for the display name and GitHub repository URL. Keep their names aligned when a replacement name is chosen; a name change does not imply a domain or repository move. The shared browser preference key, `seclume-theme`, stays stable across display-name changes.
+
+| Setting | Default | Where it is used |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `https://seclume.tech` | Website metadata, Open Graph URL base, canonical links, sitemap, robots and security.txt; dashboard link back to the website. |
+| `SECURITY_CONTACT_EMAIL` | `security@seclume.tech` | Website security/disclosure links and security.txt. |
+| `CONTACT_EMAIL` | `hello@seclume.tech` | Website general-contact and design-partner links. |
+| `PRIVACY_CONTACT_EMAIL` | `privacy@seclume.tech` | Website privacy-contact links. |
+
+Unset or empty values use the defaults. The site setting accepts HTTPS or loopback HTTP for local development, strips any path/query/fragment, and rejects credentials or other protocols. A loopback HTTP site omits the HTTPS-only security.txt Canonical. Contact settings accept plain email addresses, rejecting whitespace and header/URL injection syntax. Invalid settings fail validation without echoing their values.
+
+Set these in the appropriate app's environment, then **rebuild and redeploy**. `NEXT_PUBLIC_*` references in browser code are bundled at build time, and marketing pages are statically generated. Email settings are resolved on the server and the resulting public contacts are rendered into pages; they are not browser environment variables. The security.txt handler also resolves settings on the server. No private backend credentials belong in these settings.
+
+The dashboard retains `NEXT_PUBLIC_MARKETING_URL` as a fallback when `NEXT_PUBLIC_SITE_URL` is unset or empty; the new setting takes precedence. `NEXT_PUBLIC_AEGIS_URL`, `NEXT_PUBLIC_AEGIS_TOKEN`, backend `AEGIS_*` settings, `X-Aegis-*` headers, the `aegis` CLI and Redis prefixes are unchanged. No domain, hosting, account or repository settings are changed by editing these defaults.
+
+Static README, security policy, changelog and documentation links document the current defaults. They are not deployment templates and must be updated separately for a later domain change. Review the [remaining-reference audit](brand-reference-audit.md) for retained names, defaults and historical references.

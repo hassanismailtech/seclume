@@ -2,6 +2,23 @@
 
 ## ASSUMPTIONS
 
+### Q1: configurable public identity (2026-11-22)
+
+- The user approved Q1's plan and requested a commit and PR after every queue item where possible. Use `codex/q1-brand-config` from clean origin/main fc4ecea. Q2-Q9 remain queued; no Compose, ingress, container, backend, publishing, account or hosting changes are included here.
+- Seclume remains the public name, `https://seclume.tech` remains the default public origin, and confirmed security/hello/privacy mailboxes remain unchanged. Add `PRIVACY_CONTACT_EMAIL` alongside the three requested settings to keep the confirmed privacy mailbox independently configurable. Do not derive mailboxes from the website host.
+- Keep small `lib/brand.mjs` modules in each independently built app, with an alignment test, rather than adding a shared package or changing build roots. Reuse the existing BrandMark and preserve `seclume-theme` preferences. Server-resolved contacts live in `website/lib/contacts.mjs`; no email environment variable is read by browser components.
+- Site origins normalize to scheme/host/port and reject credentials/non-HTTPS public hosts; loopback HTTP remains usable for local development without an HTTPS security.txt Canonical. Missing/empty values use current defaults. Invalid configuration errors name only the setting, never its supplied value. Plain email validation rejects whitespace and URL/header injection syntax.
+- `NEXT_PUBLIC_SITE_URL` takes precedence over the dashboard's existing `NEXT_PUBLIC_MARKETING_URL` fallback. Public browser configuration and statically generated pages/contact links require rebuild/redeploy. Static Markdown is maintained separately; deployment variables do not rewrite the README or security policy.
+- The landing page's existing client content moves unchanged except identity references to HomePage so its server page can export canonical/Open Graph metadata. The existing playground gets a metadata layout; neither change creates a new public route. Catch-all marketing pages get route-specific canonical/Open Graph metadata.
+- CHANGELOG records the actual Aegis-to-Seclume rename, without a fabricated subsequent name or literal future-name marker. Preserve AEGIS settings, X-Aegis headers, CLI/package, Redis prefixes, LICENSE and archived PRD. Maintained docs/blueprint labels use the current public name; historical records remain historical.
+- Verification and remaining-reference inventory are recorded in docs/q1-verification.md and docs/brand-reference-audit.md. No new Python/npm dependency is added. Q1 does not claim a live deployment or completion of later queue items.
+
+### Q1 verification status
+
+- Website tests: 39 passed; dashboard identity tests: 2 passed; built-app checks with defaults: 2 passed; built-app checks after alternate-domain/contact builds: 2 passed. Both app lint/build commands and claims lint passed. Default builds were restored after the alternate test; final built-app checks passed 2/2. No live deployment was performed.
+- Full backend command `uv run --directory backend pytest -q --tb=short`: `47 failed, 240 passed, 3 warnings, 6 errors in 556.43s (0:09:16)`. Redis is unavailable locally, CADDY_BIN is unset, and the Docker engine is unavailable. The mandatory real-Redis test ran and failed; do not claim full Q1 verification. Required CI native-Redis/Caddy and container results must be checked on the PR; they are unverified until observed.
+- The new queue contract is to commit each queue item and open a PR where access permits. A task-branch push is authorized for that PR; main merges, tags, publication and later queue implementation remain unauthorized here. Stop after the Q1 report. GitHub rejected the initial task-branch push with GH007 because the unpublished commit used a private email. Use the verified public noreply address `77672747+hassanismailtech@users.noreply.github.com` for this task commit via per-command Git settings; no GitHub account/privacy change is needed.
+
 ### Brand foundation: original mark, D1 palette and D2 layout
 
 - The user authorized the next phase after public-readiness work. Use `codex/t12-brand-foundation` from origin/main a801dcf (the user's merged PR #59). This phase is the original wordmark/icon/favicon, light-default theme with explicit dark preference, and restyling existing marketing/content/playground surfaces. D3 real Wire View capture, D4 new/reordered sections and SDK tabs, and D5 full Lighthouse/physical-phone polish remain separate. No new Python/npm dependency, account change, deployment, backend route, dashboard implementation or code-identifier rename is included; the PRD remains unchanged under the user's explicit theme/rebrand override.
