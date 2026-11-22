@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { ENTITY_TYPES, EXAMPLES, MAX_CHARS, playgroundEndpoint, scrubPlayground, splitPlaceholders } from "../lib/playground.ts";
+import { ENTITY_TYPES, EXAMPLES, MAX_CHARS, UNAVAILABLE, playgroundEndpoint, scrubPlayground, splitPlaceholders } from "../lib/playground.ts";
 import { marketingPaths, sitePages } from "../lib/site-content.ts";
 
 const base = "https://example.test";
@@ -21,6 +21,20 @@ test("missing configuration and invalid input send no request", async t => {
   for (const text of ["", "  ", "x".repeat(MAX_CHARS + 1)]) assert.equal((await call(text)).ok, false);
   assert.equal((await scrubPlayground(undefined, EXAMPLES[0].text, new AbortController().signal)).ok, false);
   assert.equal(fetch.mock.callCount(), 0);
+});
+
+test("unconfigured, unreachable and 503 playgrounds show the exact paused message", async t => {
+  const paused = { ok: false, message: "The playground is temporarily paused. The source and Docker quickstart still work." };
+  assert.equal(UNAVAILABLE, paused.message);
+  assert.deepEqual(await scrubPlayground(undefined, EXAMPLES[0].text, new AbortController().signal), paused);
+  const fetch = t.mock.method(globalThis, "fetch", async () => { throw Error("private transport details"); });
+  assert.deepEqual(await call(), paused);
+  fetch.mock.mockImplementation(async () => ({ ok: false, status: 503, json() { throw Error("private server body must not be read"); } }));
+  assert.deepEqual(await call(), paused);
+  const page = await readFile(new URL("../app/(marketing)/playground/page.tsx", import.meta.url), "utf8");
+  assert.ok(page.includes('setMessage(UNAVAILABLE)'));
+  assert.ok(page.includes('aria-label="Playground alternatives"'));
+  assert.ok(page.includes('/blob/main/docs/quickstart.md'));
 });
 
 test("success sends a bounded POST and selects only scrubbed contract fields", async t => {
@@ -78,7 +92,7 @@ test("the request can be cancelled", async t => {
   const controller = new AbortController();
   const pending = call(EXAMPLES[0].text, controller.signal);
   controller.abort();
-  assert.equal((await pending).ok, false);
+  assert.deepEqual(await pending, { ok: false, message: UNAVAILABLE });
 });
 
 test("malformed success payloads are rejected", async t => {

@@ -8,6 +8,7 @@ import { GET } from "../app/.well-known/security.txt/route.ts";
 import { marketingPaths, sitePages } from "../lib/site-content.ts";
 import { applyTheme, readTheme, themeBootstrap, THEME_KEY } from "../lib/theme.ts";
 import { runInNewContext } from "node:vm";
+import { proxy } from "../proxy.ts";
 
 function themeRoot() {
   let dark = false;
@@ -52,7 +53,7 @@ test("pre-paint theme bootstrap restores dark and tolerates inaccessible storage
 const removedPaths = [
   "product/compare", "product/cloud", "product/cloud/managed-nodes", "product/cloud/audit-exports",
   "product/cloud/multi-region-failover", "product/cloud/tenant-controls", "product/cloud/jurisdiction-packs",
-  "product/cloud/support", "trust/status", "trust/dpia-pack",
+  "product/cloud/support", "trust/status", "trust/dpia-pack", "company/careers", "press",
 ];
 const read = path => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -62,6 +63,12 @@ test("unshipped roadmap routes are absent from the page registry and sitemap pat
     assert.equal(marketingPaths.includes(path), false, path);
   }
   assert.equal(Object.values(sitePages).some(page => page.status === "Roadmap"), false);
+});
+
+test("retired-page response is an empty HTTP 404", async () => {
+  const response = proxy();
+  assert.equal(response.status, 404);
+  assert.equal(await response.text(), "");
 });
 
 test("navigation, footer, landing, and related links resolve to retained pages or redirects", async () => {
@@ -99,10 +106,37 @@ test("contact and disclosure pages expose the confirmed channels", () => {
   assert.ok(security.includes("https://github.com/hassanismailtech/seclume/security/advisories/new"));
 });
 
-test("publishing the privacy contact retains the policy review qualification", () => {
+test("privacy explains actual storage boundaries and keeps its draft marker in the repository", async () => {
   const privacy = sitePages["legal/privacy"];
-  assert.equal(privacy.status, "Publication review");
+  assert.equal(privacy.status, undefined);
   assert.ok(privacy.related.some(link => link.href === "mailto:privacy@seclume.tech"));
+  const copy = JSON.stringify(privacy);
+  for (const detail of ["page memory", "local storage", "Redis Session Map", "Cleanup", "short expiry", "HMAC", "daily salt", "expiring request counters", "no Telemetry Events", "access logs", "SQLite", "temporary storage"]) {
+    assert.ok(copy.includes(detail), detail);
+  }
+  assert.doesNotMatch(copy, /Draft pending legal review|Publication review|nothing (?:is )?stored/i);
+  assert.match(await read("README.md"), /Draft pending legal review/);
+});
+
+test("navigation offers design partners without pricing or removed company links", async () => {
+  const nav = await read("components/GlobalNav.tsx");
+  assert.ok(nav.includes('/company/design-partners'));
+  assert.doesNotMatch(nav, /Pricing|["']\/pricing["']/);
+  for (const file of ["components/GlobalNav.tsx", "components/SiteFooter.tsx"]) {
+    assert.doesNotMatch(await read(file), /["']\/(?:press|company\/careers)["']/);
+  }
+});
+
+test("landing latency values match the recorded benchmark and retain its qualifications", async () => {
+  const home = await read("components/HomePage.tsx");
+  const notes = await readFile(new URL("../../NOTES.md", import.meta.url), "utf8");
+  const samples = [...home.matchAll(/p50 ([\d.]+) ms \/ p95 ([\d.]+) ms/g)];
+  assert.equal(samples.length, 4);
+  for (const [, p50, p95] of samples) assert.ok(notes.includes(`${p50} / ${p95} ms`));
+  for (const detail of ["2026-10-28", "Windows", "14.9 GB RAM", "CPU model not recorded", "100 runs", "model cache bypassed", "layer timings", "HTTP 503"]) assert.ok(home.includes(detail), detail);
+  assert.ok(home.includes('/blob/faabe2e/NOTES.md#phase-2-task-4-onnx-skip-and-cache'));
+  assert.ok(home.includes('http://127.0.0.1:8000/v1'));
+  assert.ok(home.includes('# was https://api.openai.com/v1'));
 });
 
 function siteOrigin(t, value) {

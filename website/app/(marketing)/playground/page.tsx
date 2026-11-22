@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { GITHUB_URL } from "@/lib/brand.mjs";
 import { Button } from "@/components/ui/button";
-import { ENTITY_TYPES, EXAMPLES, MAX_CHARS, playgroundEndpoint, scrubPlayground, splitPlaceholders, type PlaygroundResult } from "@/lib/playground";
+import { ENTITY_TYPES, EXAMPLES, MAX_CHARS, UNAVAILABLE, playgroundEndpoint, scrubPlayground, splitPlaceholders, type PlaygroundResult } from "@/lib/playground";
 
 const apiBase = process.env.NEXT_PUBLIC_PLAYGROUND_API;
 
@@ -50,7 +51,7 @@ export default function PlaygroundPage() {
     clearTimeout(timeout);
     if (active.current !== controller || controller.signal.aborted) {
       if (active.current === controller) {
-        setMessage("The request timed out. Please try again.");
+        setMessage(UNAVAILABLE);
         setPending(false);
       }
       return;
@@ -69,7 +70,7 @@ export default function PlaygroundPage() {
       <aside className="mt-8 rounded-xl border border-border bg-muted p-5 text-sm leading-6 text-foreground">
         <strong>Synthetic data only.</strong> Do not enter real names, contact details, or identifiers. Use a private, self-hosted instance for real data. Detection has limits; review the output.
       </aside>
-      {!available && <p role="status" className="mt-6 rounded-lg border border-border p-4 text-foreground">Coming soon. The playground API is not configured for this site.</p>}
+      {!available && <p role="status" className="mt-6 rounded-lg border border-border p-4 text-foreground">{UNAVAILABLE}</p>}
       <form onSubmit={submit} className="mt-8" aria-busy={pending}>
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="mr-2 text-sm text-muted-foreground">Load an example</span>
@@ -89,6 +90,10 @@ export default function PlaygroundPage() {
         {message && <p role="alert" className="text-foreground">{message}</p>}
         {result && <p className="text-muted-foreground">Result ready · Mode: {result.mode} · Scrubber time: {result.overhead_ms.toFixed(2)} ms</p>}
       </div>
+      {(!available || message === UNAVAILABLE) && <nav aria-label="Playground alternatives" className="mt-4 flex flex-wrap gap-4 text-sm text-primary">
+        <a href={GITHUB_URL} className="underline underline-offset-4">View source</a>
+        <a href={`${GITHUB_URL}/blob/main/docs/quickstart.md`} className="underline underline-offset-4">Docker quickstart</a>
+      </nav>}
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <Output title="Scrubbed input" text={result?.scrubbed} />
         <Output title="Simulated reply" text={result?.simulated_reply} />

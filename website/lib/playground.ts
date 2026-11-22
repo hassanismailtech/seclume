@@ -15,7 +15,7 @@ export type PlaygroundResult = {
 };
 export type PlaygroundResponse = { ok: true; result: PlaygroundResult } | { ok: false; message: string };
 
-const UNAVAILABLE = "The playground is unavailable. Please try again later.";
+export const UNAVAILABLE = "The playground is temporarily paused. The source and Docker quickstart still work.";
 
 export function playgroundEndpoint(base: string | undefined): string | null {
   if (!base?.trim()) return null;
