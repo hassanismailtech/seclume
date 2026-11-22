@@ -199,6 +199,7 @@ jobs:
           assert proxy['HostConfig']['PortBindings'] == expected
           assert proxy['NetworkSettings']['Ports'] == expected
           assert set(redis['NetworkSettings']['Networks']) == {os.environ['COMPOSE_PROJECT_NAME'] + '_private'}
+          assert set(proxy['NetworkSettings']['Networks']) == {os.environ['COMPOSE_PROJECT_NAME'] + suffix for suffix in ('_private', '_default')}
           with socket.socket() as connection:
               connection.settimeout(2)
               assert connection.connect_ex(('127.0.0.1', 6379)) == errno.ECONNREFUSED, 'Host Redis port is reachable or probe failed'
