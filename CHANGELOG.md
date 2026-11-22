@@ -4,22 +4,28 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
-Planned target: **0.4.0**. These changes are prepared on task branches and have not been released. See the [release checklist](docs/release-checklist.md) for verification and publication gates.
+Planned target: **0.4.0**. This is the draft release summary, not a dated release or confirmation of a versioned image. See the [release checklist](docs/release-checklist.md) for verification and publication gates.
 
 ### Added
 - Disabled-by-default synthetic playground API with atomic Redis rate limiting, temporary Session Map cleanup, scrubbed output and a simulated reply. Playground requests call no Upstream and emit no Telemetry Events.
 - Minimal playground page with approved synthetic examples, highlighted Placeholders, counts, measured scrub time, actual full/lite mode, and safe error states. Submissions require an explicitly configured public API URL.
 - CI checks for native-Redis backend tests, image startup refusal, Compose health, website client tests, and public claims lint.
 - Local quickstart, complete Python configuration reference, security model, and limitations guides.
+- Standalone playground deployment preparation: private Redis networking, a loopback-published Proxy, an external smoke-check script, status-only Caddy health configuration and monitoring instructions. See the [deployment guide](docs/deployment.md); public hosting and external-network verification remain separate.
+- Separate `lite` Docker build target and `-lite` image tag configuration alongside the existing runtime target; CI verifies the lite image contents and host-loopback playground networking. Publication and platform validation remain release gates.
+- [Ten-minute reviewer guide](docs/review-in-10-minutes.md) and [three contribution issue drafts](docs/good-first-issues.md); the drafts do not create GitHub issues.
 
 ### Fixed
 - Wildcard addresses no longer count as loopback for startup checks. `BIND_HOST` defaults to `127.0.0.1`; the Docker entrypoint uses that setting. Non-loopback startup requires tenant keys or the explicit development bypass; tenant keys require a dedicated ticket secret.
 - Public wording now qualifies Session continuity, synthetic evaluation evidence, storage, and pilot availability. Removed unshipped roadmap stub pages and corrected the source-code licence footer.
+- Website SDK quickstart and navigation fixes, sourced synthetic evidence, safe paused-playground messaging, and a Privacy page whose legal-review status remains recorded in the source.
 
 ### Changed
-- Renamed from Aegis to Seclume. Seclume remains the public name; no subsequent name has been selected. Public site and contact settings are configurable independently of the display name and GitHub repository. Compatibility identifiers are unchanged.
-- Python package metadata is aligned to the planned release version; dependency requirements and locked third-party versions are unchanged.
+- Renamed from Aegis to Seclume; the product display name is now Seclume Proxy and the umbrella brand remains Seclume. Public site and contact settings are configurable independently of the display name and GitHub repository. Compatibility identifiers are unchanged.
+- Light-default website styling, an explicit dark-theme preference, and consistent product titles, descriptions and Open Graph metadata.
+- Python and private website/dashboard package metadata are aligned to the planned release version. The web package manifests and lockfile root versions are now 0.4.0; this alignment changes no dependency requirements or locked third-party versions.
 - The repository is now `hassanismailtech/seclume`. Existing `AEGIS_*` settings, `X-Aegis-*` headers, CLI name and Redis prefixes are unchanged; registry-image publication remains separate work.
+- Dependabot version updates use one weekly group per ecosystem: uv for the backend, npm across both web apps, and GitHub Actions. Major updates to TypeScript, ESLint and `@types/node` are ignored; minor/patch updates remain eligible. This configuration does not itself run an update or change account settings.
 
 ## [0.3.0] - 2026-10-28
 ### Added
