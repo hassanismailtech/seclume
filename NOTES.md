@@ -2,6 +2,13 @@
 
 ## ASSUMPTIONS
 
+### Q9: predeploy gate report (2026-11-22)
+
+- The user authorized Q9 after Q8. Start `codex/q9-predeploy-report` from clean origin/main `86c86b11e00cfcaefd3fcf0b02d97c1f68322a4d`, containing merged Q8 PR #69. Scope is docs/predeploy-report.md and these notes. Record evidence and gaps; do not repair unrelated test portability, change runtime/configuration/dependencies, rename identifiers, mark release authorization complete or start another task.
+- Run current local claims/lock checks, website and frontend tests/lint/build/audits, production HTTP identity tests and both Compose config validations. Existing Windows README CRLF sensitivity must be recorded with the original failure and the temporary LF-normalized rerun; restore README afterward. No test implementation change or dependency addition is included.
+- Keep the established CI-only Redis strategy. Probe current local prerequisites without installing/starting services. Full backend pytest must run in PR CI with native Redis (snapshots/AOF off), verified Caddy and the mandatory real-Redis lifespan case, with no deselection or silent skip. Container/startup/health and playground-networking gates must be observed for this report branch rather than inferred from Q8 results.
+- Report the exact candidate/base, tested PR head/merge ref and job links; distinguish local failures from successful CI and any later documentation-only evidence update. Evidence excerpts contain only statuses, counts, types, identifiers and timings, not request/response bodies, planted originals, Session Map contents or credentials. Use a DCO-signed commit and draft PR; no merge, tag, publication, manual workflow dispatch, deployment, DNS, account or package-visibility change. External smoke and platform/hosting gates remain unverified unless actually run.
+
 ### Q8: v0.4.0 release preparation and Dependabot grouping (2026-11-22)
 
 - The user authorized Q8 after the identity phase. Start `codex/q8-release-preparation` from clean origin/main `dfe4cbb`, which includes the user's merged PR #68 and its subsequent README/claims corrections. Q9 remains unstarted; no tag, merge, manual publication, workflow dispatch, deployment, account or repository setting change is included.
