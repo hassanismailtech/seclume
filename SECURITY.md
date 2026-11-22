@@ -6,6 +6,8 @@ Seclume sits between applications and external models, so we take reports seriou
 
 Report privately to [security@seclume.tech](mailto:security@seclume.tech) or through [GitHub Security → Report a vulnerability](https://github.com/hassanismailtech/seclume/security/advisories/new) (private advisory). Please do not open a public issue for security problems.
 
+The website's disclosure contact uses `SECURITY_CONTACT_EMAIL`, defaulting to the address above. Its security.txt Canonical uses `NEXT_PUBLIC_SITE_URL`, defaulting to `https://seclume.tech`; the GitHub advisory URL remains tied to this repository. Deployment overrides do not rewrite this policy file. See [configuration](docs/configuration.md#public-identity-and-contacts).
+
 Include: affected version or commit, steps to reproduce, impact, and any proof of concept. **Use synthetic data only. Never send us real personal data.**
 
 We aim to acknowledge within 3 working days, give an initial assessment within 7 days, and agree a disclosure date with you. We will credit you unless you prefer otherwise. There is no bug bounty yet.

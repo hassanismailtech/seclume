@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand.mjs";
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
 
@@ -25,7 +26,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col gap-5 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span className="inline-flex items-center gap-2"><BrandMark className="size-6" />Seclume · open source · Apache-2.0</span>
+          <span className="inline-flex items-center gap-2"><BrandMark className="size-6" />{BRAND_NAME} · open source · Apache-2.0</span>
           <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Legal navigation">
             {legalLinks.map(([label, href]) => <Link key={href} href={href} className="transition-colors duration-150 ease-in-out hover:text-primary">{label}</Link>)}
           </nav>

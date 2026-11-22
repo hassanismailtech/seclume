@@ -1,4 +1,4 @@
-# Aegis site architecture & mega-menu blueprint
+# Seclume site architecture & mega-menu blueprint
 
 > **Status:** Information architecture only. No page copy. Claims on shipped pages must stay within `docs/CLAIMS.md` (OK rows only). Numbers from `docs/metrics.txt`.
 >
@@ -6,7 +6,7 @@
 >
 > **Nav modes:** `LANDING_COPY.md` defines a **launch chrome** (How it works · Evidence · Deploy · Docs · GitHub + Design partner CTA). This blueprint keeps that as the minimal header for v0 launch and expands it into an OpenAI-class **mega-menu** for the venture-scale site. Cloud / Enterprise items are **commercial / roadmap surfaces** aligned with STRATEGY §6 open-core vs paid hypotheses—not claims that those capabilities ship in Compose today.
 >
-> **Hard product rule (STRATEGY §2):** Aegis must run inside the customer boundary (VPC, on-prem, or a **Nigeria-hosted** managed instance). Never market an offshore hosted proxy that receives raw PII.
+> **Hard product rule (STRATEGY §2):** Seclume must run inside the customer boundary (VPC, on-prem, or a **Nigeria-hosted** managed instance). Never market an offshore hosted proxy that receives raw PII.
 
 ---
 
@@ -88,7 +88,7 @@
 
 | Column | Items |
 |---|---|
-| **Architecture & proof** | Security Architecture · Wire Tap & evidence · What Aegis does not do · Claims & Methodology |
+| **Architecture & proof** | Security Architecture · Wire Tap & evidence · What Seclume does not do · Claims & Methodology |
 | **Operations & frameworks** | Subprocessors · Status · Compliance Frameworks (NDPA 2023, GAID 2025) · Responsible disclosure |
 | **CTA** | Report a vulnerability → `/trust/security` or SECURITY.md flow |
 
@@ -112,7 +112,7 @@ For each row: **URL** · **H1** · **Purpose (1 sentence)**.
 
 | URL | H1 | Purpose | Surface |
 |---|---|---|---|
-| `/` | Aegis | Primary landing: problem, core loop, evidence teaser, Quickstart CTA, design-partner CTA. | shipped |
+| `/` | Seclume | Primary landing: problem, core loop, evidence teaser, Quickstart CTA, design-partner CTA. | shipped |
 | `/pricing` | Pricing | Redirect or soft page: no public prices yet; point to Design Partner Program (WEBSITE plan §5). | roadmap |
 | `/sitemap` | Sitemap | Human-readable index; pair with `/sitemap.xml`. | shipped |
 | `/press` | Press & brand kit | Logos and naming rules once trademark/domain checks clear (STRATEGY §6). | shipped |
@@ -136,7 +136,7 @@ For each row: **URL** · **H1** · **Purpose (1 sentence)**.
 | URL | H1 | Purpose | Surface |
 |---|---|---|---|
 | `/product/cloud` | Cloud & Enterprise | Commercial hub for paid open-core add-ons and **Nigeria-hosted** managed instances (processor posture, DPA)—never an offshore raw-PII proxy. | roadmap |
-| `/product/cloud/managed-nodes` | Managed Nodes | Nigeria-hosted or customer-VPC operated nodes (upgrades, health); Aegis remains inside the data boundary. | roadmap |
+| `/product/cloud/managed-nodes` | Managed Nodes | Nigeria-hosted or customer-VPC operated nodes (upgrades, health); Seclume remains inside the data boundary. | roadmap |
 | `/product/cloud/audit-exports` | Audit Exports | Transfer-record / DPIA-input / hash-chained audit exports for DPO and DPCO workflows (STRATEGY §6). | roadmap |
 | `/product/cloud/multi-region-failover` | Multi-Region Failover | HA / Helm / failover hypotheses for managed or self-hosted enterprise; Session Map semantics stay explicit. | roadmap |
 | `/product/cloud/tenant-controls` | Tenant Controls | Multi-tenant policy engine, per-tenant keys, SSO/RBAC (roadmap) on top of OSS auth/limits. | roadmap |
@@ -182,7 +182,7 @@ For each row: **URL** · **H1** · **Purpose (1 sentence)**.
 | URL | H1 | Purpose | Surface |
 |---|---|---|---|
 | `/docs` | Documentation | Versioned docs home with search entry and task-oriented TOC. | docs |
-| `/docs/introduction` | Introduction | What Aegis is, glossary, and honest limitations pointer. | docs |
+| `/docs/introduction` | Introduction | What Seclume is, glossary, and honest limitations pointer. | docs |
 | `/docs/concepts` | Concepts | Proxy, Scrubber, Placeholder, Session Map, Reinjector, Upstream, Wire Tap. | docs |
 | `/docs/quickstart` | Docs Quickstart | Canonical install and first request (mirrors `/developers/quickstart` with more depth). | docs |
 | `/docs/configuration` | Configuration | Environment variables and operational toggles (auth, limits, NER, Upstream). | docs |
@@ -202,12 +202,12 @@ For each row: **URL** · **H1** · **Purpose (1 sentence)**.
 | `/trust` | Trust & Security | Hub for architecture, methodology, subprocessors, status, and frameworks. | shipped |
 | `/trust/architecture` | Security Architecture | Boundary diagram: scrub → Session Map → Upstream → reinject; fail-closed paths. | shipped |
 | `/trust/wire-tap` | Wire Tap & evidence | How post-scrub evidence is produced and what it never contains. | shipped |
-| `/trust/limitations` | What Aegis does not do | Explicit non-goals: no legal assurance, no adversarial evasion claim, ephemeral Redis, etc. | shipped |
+| `/trust/limitations` | What Seclume does not do | Explicit non-goals: no legal assurance, no adversarial evasion claim, ephemeral Redis, etc. | shipped |
 | `/trust/methodology` | Claims & Methodology | How leak tests and recall evals are run; links to `CLAIMS.md` / `metrics.txt` sourcing rules. | shipped |
 | `/trust/subprocessors` | Subprocessors | Processors for marketing site, email routing, and Nigeria-hosted Cloud (OSS self-host has none by default). Disclose offshore marketing processors honestly. | roadmap |
 | `/trust/status` | Status | Status for managed offerings (later); OSS users monitor their own deploy. | roadmap |
 | `/trust/frameworks` | Compliance Frameworks | Neutral primers on NDPA 2023 and GAID 2025—helps document controls; not certifications. | shipped |
-| `/trust/frameworks/ndpa-2023` | NDPA 2023 | Cross-border *context* (s.41 etc.): Aegis as pseudonymisation / minimisation / evidence—not a lawful-transfer silver bullet. | shipped |
+| `/trust/frameworks/ndpa-2023` | NDPA 2023 | Cross-border *context* (s.41 etc.): Seclume as pseudonymisation / minimisation / evidence—not a lawful-transfer silver bullet. | shipped |
 | `/trust/frameworks/gaid-2025` | GAID 2025 | Guidance themes (e.g. CAR / DPCO context) mapped at a high level; not legal advice. | shipped |
 | `/trust/security` | Security & disclosure | Architecture summary + responsible disclosure (`SECURITY.md`); alias `/security`. | shipped |
 | `/trust/open-source-licenses` | Open source & third-party licences | Project license plus third-party notices for the marketing/docs sites. | shipped |
@@ -218,7 +218,7 @@ For each row: **URL** · **H1** · **Purpose (1 sentence)**.
 | URL | H1 | Purpose | Surface |
 |---|---|---|---|
 | `/company` | Company | About hub: mission, open-source stance, design partners. | shipped |
-| `/company/about` | About Us | Who builds Aegis and why Nigerian-aware agent infrastructure. | shipped |
+| `/company/about` | About Us | Who builds Seclume and why Nigerian-aware agent infrastructure. | shipped |
 | `/company/blog` | Blog | Essays and product thinking; every post claim-checked against `CLAIMS.md`. | shipped |
 | `/company/blog/[slug]` | *(post title)* | Individual article. | shipped |
 | `/company/changelog` | Changelog | User-facing product changes (align with repo `CHANGELOG.md`). | shipped |
@@ -281,7 +281,7 @@ Aligned with WEBSITE plan §6 (Product / Community / Support / Company) plus Tru
 - Acceptable Use → `/legal/acceptable-use` (alias `/acceptable-use`)
 - Cookie Notice → `/legal/cookies`
 - License → `/license`
-- © {year} Aegis
+- © {year} Seclume
 
 ---
 
@@ -361,7 +361,7 @@ Replace `GITHUB_URL` and `STATUS_URL` at build time.
             {
               "title": "Cloud overview",
               "href": "/product/cloud",
-              "description": "Managed operation of the Aegis boundary.",
+              "description": "Managed operation of the Seclume boundary.",
               "badge": "Roadmap"
             },
             {
@@ -548,7 +548,7 @@ Replace `GITHUB_URL` and `STATUS_URL` at build time.
             {
               "title": "API Reference",
               "href": "/docs/api",
-              "description": "Proxy and Aegis operational routes."
+              "description": "Proxy and Seclume operational routes."
             },
             {
               "title": "Entity types",
@@ -620,7 +620,7 @@ Replace `GITHUB_URL` and `STATUS_URL` at build time.
               "description": "Post-scrub proof of Upstream traffic."
             },
             {
-              "title": "What Aegis does not do",
+              "title": "What Seclume does not do",
               "href": "/trust/limitations",
               "description": "Non-goals and honest limitations."
             },

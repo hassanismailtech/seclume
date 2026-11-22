@@ -17,8 +17,9 @@ Planned target: **0.4.0**. These changes are prepared on task branches and have 
 - Public wording now qualifies Session continuity, synthetic evaluation evidence, storage, and pilot availability. Removed unshipped roadmap stub pages and corrected the source-code licence footer.
 
 ### Changed
+- Renamed from Aegis to Seclume. Seclume remains the public name; no subsequent name has been selected. Public site and contact settings are configurable independently of the display name and GitHub repository. Compatibility identifiers are unchanged.
 - Python package metadata is aligned to the planned release version; dependency requirements and locked third-party versions are unchanged.
-- The repository is now `hassanismailtech/seclume`. Existing `AEGIS_*` settings, `X-Aegis-*` headers, CLI name and Redis prefixes are unchanged; visual rebranding and registry-image publication remain separate work.
+- The repository is now `hassanismailtech/seclume`. Existing `AEGIS_*` settings, `X-Aegis-*` headers, CLI name and Redis prefixes are unchanged; registry-image publication remains separate work.
 
 ## [0.3.0] - 2026-10-28
 ### Added

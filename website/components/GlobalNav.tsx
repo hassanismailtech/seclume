@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND_NAME } from "@/lib/brand.mjs";
+
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -124,7 +126,7 @@ const solutionLinks: MenuLink[] = [
 const developerLinks: MenuLink[] = [
   {
     title: "Quickstart",
-    description: "Bring up Seclume and change your SDK base URL.",
+    description: `Bring up ${BRAND_NAME} and change your SDK base URL.`,
     href: "/developers/quickstart",
     icon: Terminal,
   },
@@ -150,7 +152,7 @@ const developerLinks: MenuLink[] = [
 
 const companyLinks: MenuLink[] = [
   {
-    title: "About Seclume",
+    title: `About ${BRAND_NAME}`,
     description: "The open-source data-boundary project.",
     href: "/company/about",
     icon: ShieldCheck,
@@ -241,7 +243,7 @@ export function GlobalNav() {
       <div className="mx-auto flex h-18 max-w-[1120px] items-center justify-between gap-4">
         <Link href="/" className="site-wordmark inline-flex items-center gap-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <BrandMark />
-          Seclume
+          {BRAND_NAME}
         </Link>
 
         <NavigationMenu className="hidden lg:flex" align="start">
@@ -304,7 +306,7 @@ export function GlobalNav() {
           </SheetTrigger>
           <SheetContent className="w-[min(22rem,90vw)] border-l border-border bg-background p-0 text-foreground" side="right">
             <SheetHeader className="border-b border-border px-5 py-4">
-              <SheetTitle className="text-foreground">Navigate Seclume</SheetTitle>
+              <SheetTitle className="text-foreground">Navigate {BRAND_NAME}</SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-1 p-3" aria-label="Mobile navigation">
               <MobileLink href="/product">Product</MobileLink>

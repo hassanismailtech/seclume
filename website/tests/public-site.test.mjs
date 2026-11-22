@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { BRAND_NAME, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
+import { contacts } from "../lib/contacts.mjs";
+import { spawnSync } from "node:child_process";
 import { GET } from "../app/.well-known/security.txt/route.ts";
 import { marketingPaths, sitePages } from "../lib/site-content.ts";
 import { applyTheme, readTheme, themeBootstrap, THEME_KEY } from "../lib/theme.ts";
@@ -68,7 +71,7 @@ test("navigation, footer, landing, and related links resolve to retained pages o
   const valid = new Set([...routes, ...redirects.map(match => match[1])]);
   for (const match of redirects) assert.ok(routes.has(match[2]), `redirect ${match[1]}`);
   const links = Object.values(sitePages).flatMap(page => page.related?.map(link => link.href) ?? []);
-  for (const file of ["components/GlobalNav.tsx", "components/SiteFooter.tsx", "app/(marketing)/page.tsx"]) {
+  for (const file of ["components/GlobalNav.tsx", "components/SiteFooter.tsx", "app/(marketing)/page.tsx", "components/HomePage.tsx"]) {
     const source = await read(file);
     links.push(...[...source.matchAll(/["'](\/[^"'\s]*)["']/g)].map(match => match[1]));
     assert.equal(source.includes("mailto:?"), false, file);
@@ -128,12 +131,68 @@ test("security contact has a single expiry, private report link, and HTTPS canon
   assert.ok(body.endsWith("\n"));
 });
 
-for (const origin of [undefined, "", "invalid", "http://example.test", "https://user:secret@example.test"]) {
-  test(`security contact omits unverified canonical (${origin === undefined ? "unset" : origin === "" ? "empty" : "invalid origin"})`, async t => {
+for (const origin of [undefined, ""]) {
+  test("security contact uses the default canonical when unset or empty", async t => {
     siteOrigin(t, origin);
-    const body = await GET().text();
-    assert.equal(body.includes("Canonical:"), false);
-    assert.equal(body.includes("secret"), false);
-    assert.match(body, /^Expires: /m);
+    assert.match(await GET().text(), /^Canonical: https:\/\/seclume\.tech\/\.well-known\/security.txt$/m);
+  });
+}
+
+for (const origin of ["invalid", "http://example.test", "https://user:secret@example.test", "javascript:private-marker"]) {
+  test("invalid site configuration fails without disclosing its value", t => {
+    siteOrigin(t, origin);
+    assert.throws(GET, error => error.message === "NEXT_PUBLIC_SITE_URL must be an HTTPS origin or a loopback HTTP origin");
+  });
+}
+
+test("loopback HTTP is usable locally but has no HTTPS canonical", async t => {
+  siteOrigin(t, "http://127.0.0.1:3001/path");
+  assert.equal(siteUrl(), "http://127.0.0.1:3001");
+  assert.equal((await GET().text()).includes("Canonical:"), false);
+});
+
+function contactEnv(t, name, value) {
+  const previous = process.env[name];
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+  t.after(() => {
+    if (previous === undefined) delete process.env[name];
+    else process.env[name] = previous;
+  });
+}
+
+test("brand and contact defaults remain independent of an alternate site origin", t => {
+  siteOrigin(t, "https://alternate.example.test/path?query=ignored#fragment");
+  for (const key of ["SECURITY_CONTACT_EMAIL", "CONTACT_EMAIL", "PRIVACY_CONTACT_EMAIL"]) contactEnv(t, key, undefined);
+  assert.equal(BRAND_NAME, "Seclume");
+  assert.equal(GITHUB_URL, "https://github.com/hassanismailtech/seclume");
+  assert.equal(siteUrl(), "https://alternate.example.test");
+  assert.deepEqual(contacts(), { security: "security@seclume.tech", general: "hello@seclume.tech", privacy: "privacy@seclume.tech" });
+});
+
+test("contact overrides reach security.txt and generated marketing page content", async t => {
+  siteOrigin(t, "https://alternate.example.test");
+  contactEnv(t, "SECURITY_CONTACT_EMAIL", "security@example.test");
+  contactEnv(t, "CONTACT_EMAIL", "hello@example.test");
+  contactEnv(t, "PRIVACY_CONTACT_EMAIL", "privacy@example.test");
+  const body = await GET().text();
+  assert.match(body, /^Contact: mailto:security@example.test$/m);
+  assert.match(body, /^Canonical: https:\/\/alternate.example.test\/\.well-known\/security.txt$/m);
+  const result = spawnSync(process.execPath, ["--experimental-strip-types", "--input-type=module", "-e", 'const {sitePages} = await import("./lib/site-content.ts"); console.log(JSON.stringify(sitePages));'], { cwd: new URL("../", import.meta.url), encoding: "utf8", env: process.env });
+  assert.equal(result.status, 0, result.stderr);
+  const pages = JSON.parse(result.stdout);
+  const rendered = JSON.stringify(pages);
+  for (const value of ["security@example.test", "hello@example.test", "privacy@example.test"]) assert.ok(rendered.includes(value));
+  assert.equal(rendered.includes("@seclume.tech"), false);
+  assert.equal(new URL(pages["company/design-partners"].related[0].href).searchParams.get("subject"), "Design partner");
+});
+
+for (const setting of ["SECURITY_CONTACT_EMAIL", "CONTACT_EMAIL", "PRIVACY_CONTACT_EMAIL"]) {
+  test(`${setting} rejects injection without echoing the supplied address`, t => {
+    contactEnv(t, setting, undefined);
+    for (const value of ["private-marker@example.test\nCanonical: bad", "private-marker@example.test?subject=bad", "private-marker%0A@example.test", "Display <private-marker@example.test>"]) {
+      process.env[setting] = value;
+      assert.throws(contacts, error => error.message === `${setting} must be a plain email address`);
+    }
   });
 }

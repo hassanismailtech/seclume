@@ -1,6 +1,6 @@
 # Release preparation: target v0.4.0
 
-**Unreleased.** Package metadata identifies the planned version; it is not evidence of a GitHub release or available container image. No release date, tag, registry publication, package-visibility change or repository rename is performed by this preparation task. Product and code identifiers remain Aegis.
+**Unreleased.** Package metadata identifies the planned version; it is not evidence of a GitHub release or available container image. No release date, tag, registry publication, package-visibility change or repository rename is performed by this preparation task. The public product name is Seclume; code identifiers remain unchanged.
 
 The existing [publish workflow](../.github/workflows/publish.yml) publishes on pushes to `main`, version tags and manual dispatch. It does not wait for the separate CI/evaluation workflows. **Merging to `main` can therefore publish an image.** Do not merge, tag or dispatch as part of preparation; the publishing behavior and gates need explicit review before those actions.
 

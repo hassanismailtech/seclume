@@ -10,6 +10,8 @@ Seclume is an OpenAI- and Anthropic-compatible Proxy. Its Scrubber replaces dete
 
 [Visit Seclume on the web →](https://seclume.tech)
 
+The public name remains Seclume. Website and dashboard site links use `NEXT_PUBLIC_SITE_URL` (default `https://seclume.tech`); website contact settings default to the confirmed security, hello and privacy mailboxes. See [public identity configuration](docs/configuration.md#public-identity-and-contacts) before changing a domain or contact address. Rebuild and redeploy the apps after changing their settings; repository Markdown and GitHub URLs are maintained separately.
+
 [![CI](https://github.com/hassanismailtech/seclume/actions/workflows/ci.yml/badge.svg)](https://github.com/hassanismailtech/seclume/actions/workflows/ci.yml)
 [![Evaluation](https://github.com/hassanismailtech/seclume/actions/workflows/eval.yml/badge.svg)](https://github.com/hassanismailtech/seclume/actions/workflows/eval.yml)
 [![License: Apache--2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)

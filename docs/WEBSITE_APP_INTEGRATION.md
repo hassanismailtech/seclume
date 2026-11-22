@@ -4,12 +4,14 @@
 
 Run two Vercel projects from this monorepo:
 
-| Surface | Root directory | Current deployment | Production target | Job |
+| Surface | Root directory | Recorded transition URL | Production target | Job |
 |---|---|---|---|---|
 | Marketing | `website` | `https://website-woad-six-53.vercel.app` | apex or `www` domain | Public product, trust, company, legal-review, and documentation-entry routes |
 | Dashboard | `frontend` | `https://aegis-liard-pi.vercel.app` | `app.<domain>` | Authenticated or deployment-scoped operational control plane |
 
-The marketing site must never proxy dashboard API traffic or render the dashboard in an iframe. The dashboard calls the customer-controlled Aegis Proxy directly through `NEXT_PUBLIC_AEGIS_URL`.
+The marketing site must never proxy dashboard API traffic or render the dashboard in an iframe. The dashboard calls the customer-controlled Seclume Proxy directly through `NEXT_PUBLIC_AEGIS_URL`.
+
+These recorded aliases are historical deployment references, not Q1 hosting verification. The default public marketing origin is now `https://seclume.tech`; deployment/project settings must be verified separately.
 
 ## Why this is needed
 
@@ -23,17 +25,17 @@ Set these public environment variables in production and preview deployments:
 |---|---|---|
 | Marketing | `NEXT_PUBLIC_APP_URL` | `https://aegis-liard-pi.vercel.app` during transition; `https://app.<domain>` after cutover |
 | Marketing | `NEXT_PUBLIC_DASHBOARD_ENABLED` | `false` until the dashboard is ready for visitor navigation; `true` after cutover |
-| Dashboard | `NEXT_PUBLIC_MARKETING_URL` | `https://website-woad-six-53.vercel.app` during transition; `https://<domain>` after cutover |
-| Marketing | `NEXT_PUBLIC_SITE_URL` | Marketing origin for metadata and canonical URLs |
-| Dashboard | `NEXT_PUBLIC_AEGIS_URL` | Customer-controlled Aegis Proxy URL |
+| Dashboard | `NEXT_PUBLIC_MARKETING_URL` | Legacy fallback when `NEXT_PUBLIC_SITE_URL` is unset or empty |
+| Both | `NEXT_PUBLIC_SITE_URL` | Marketing origin, default `https://seclume.tech`; website metadata/canonical URLs and dashboard return link |
+| Dashboard | `NEXT_PUBLIC_AEGIS_URL` | Customer-controlled Seclume Proxy URL |
 
-The marketing navigation displays **Dashboard** only when `NEXT_PUBLIC_APP_URL` is configured and `NEXT_PUBLIC_DASHBOARD_ENABLED=true`. Until then, the public marketing site is the sole visitor entry point and does not link to an incomplete telemetry deployment. The dashboard displays **Aegis site** only when `NEXT_PUBLIC_MARKETING_URL` is configured.
+The marketing navigation displays **Dashboard** only when `NEXT_PUBLIC_APP_URL` is configured and `NEXT_PUBLIC_DASHBOARD_ENABLED=true`. Until then, the public marketing site is the sole visitor entry point and does not link to an incomplete telemetry deployment. The dashboard displays **Seclume site**, using `NEXT_PUBLIC_SITE_URL`, then the legacy `NEXT_PUBLIC_MARKETING_URL`, then the current public-domain default. Rebuild and redeploy after configuration changes; see [public identity and contacts](configuration.md#public-identity-and-contacts).
 
 ## Rollout
 
 1. Keep the marketing Vercel project on root directory `website` and the dashboard project on root directory `frontend`; never swap either root directory.
-2. Add `NEXT_PUBLIC_MARKETING_URL` to the dashboard in Production and Preview scopes. Keep `NEXT_PUBLIC_DASHBOARD_ENABLED=false` on marketing until the dashboard is ready.
-3. Deploy the dashboard without assigning the apex domain. Verify that it connects only to its configured Aegis Proxy and never shows pre-scrub text or Session Map content.
+2. Set `NEXT_PUBLIC_SITE_URL` in both projects' Production and Preview scopes. Keep `NEXT_PUBLIC_DASHBOARD_ENABLED=false` on marketing until the dashboard is ready.
+3. Deploy the dashboard without assigning the apex domain. Verify that it connects only to its configured Seclume Proxy and never shows pre-scrub text or Session Map content.
 4. Assign the production hosts: apex or `www` for marketing, `app` subdomain for the dashboard. Update the cross-link variables above in both production and preview scopes, then set `NEXT_PUBLIC_DASHBOARD_ENABLED=true` on marketing.
 5. Verify browser navigation in both directions, session behaviour, CSP/CORS rules for the dashboard-to-Proxy connection, and the marketing redirects (`/security`, `/privacy`, `/terms`, `/acceptable-use`).
 6. After a stable observation period, retire only obsolete aliases or the previous dashboard deployment. Do not delete the project history as part of this rollout.
