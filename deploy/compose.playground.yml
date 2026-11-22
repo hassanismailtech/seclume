@@ -15,6 +15,9 @@ services:
 
   aegis:
     image: ${SECLUME_IMAGE:?Set SECLUME_IMAGE to the reviewed local image or digest}
+    build:
+      context: ../backend
+      target: lite
     restart: unless-stopped
     command:
       - /bin/sh

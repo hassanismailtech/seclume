@@ -109,9 +109,11 @@ jobs:
       - name: Check isolated playground deployment
         env:
           CORS_ORIGINS: http://localhost:3000
+          SECLUME_IMAGE: aegis:ci-${{ github.sha }}-lite
         run: |
           docker compose down --remove-orphans
           docker compose -f deploy/compose.playground.yml -p aegis-playground-ci config --quiet
+          docker compose -f deploy/compose.playground.yml -p aegis-playground-ci build aegis
           docker compose -f deploy/compose.playground.yml -p aegis-playground-ci \
             up --detach --no-build --wait --wait-timeout 180
           docker compose -f deploy/compose.playground.yml -p aegis-playground-ci exec -T aegis \
@@ -126,7 +128,7 @@ jobs:
             docker rm --force startup-guard
           fi
           docker compose down --remove-orphans
-          CORS_ORIGINS=http://localhost:3000 docker compose \
+          SECLUME_IMAGE="${SECLUME_IMAGE}-lite" CORS_ORIGINS=http://localhost:3000 docker compose \
             -f deploy/compose.playground.yml -p aegis-playground-ci down --remove-orphans
   playground-networking:
     runs-on: ubuntu-24.04
@@ -155,8 +157,38 @@ jobs:
                   assert connection.connect_ex(('127.0.0.1', port)) == errno.ECONNREFUSED, 'Test port is not free'
           print('Host test ports are free')
           PY
-      - name: Build local runtime image
-        run: docker build --target runtime --tag "$SECLUME_IMAGE" backend
+      - name: Build local lite image
+        run: docker build --target lite --tag "$SECLUME_IMAGE" backend
+      - name: Verify lite image contents and report size
+        run: |
+          size=$(docker image inspect --format '{{.Size}}' "$SECLUME_IMAGE")
+          test "$size" -gt 0
+          printf 'Lite image size: %s bytes\n' "$size"
+          docker run --rm --network none --read-only --tmpfs /tmp -i "$SECLUME_IMAGE" python - <<'PY'
+          import importlib.metadata
+          import importlib.util
+          import os
+          import re
+          from pathlib import Path
+          from app.config import settings
+          from app.main import app
+          excluded = {'torch', 'gliner', 'transformers', 'onnx', 'onnxruntime', 'protobuf'}
+          installed = {distribution.metadata['Name'].lower().replace('_', '-') for distribution in importlib.metadata.distributions()}
+          assert not installed.intersection(excluded), 'ML distribution present'
+          for module in ('torch', 'gliner', 'transformers', 'onnx', 'onnxruntime'):
+              assert importlib.util.find_spec(module) is None, 'ML module present'
+          required = {re.split(r'[<>=!~\[; ]', requirement, 1)[0].lower() for requirement in importlib.metadata.requires('aegis')}
+          assert not required.intersection(excluded), 'Lite metadata still requires ML packages'
+          assert importlib.metadata.version('aegis')
+          assert not settings.ner_enabled and os.environ['NER_ENABLED'] == 'false'
+          assert app is not None
+          assert not Path(os.environ['HF_HOME']).exists(), 'Model cache present'
+          assert not Path('/app/data/ner_onnx').exists(), 'ONNX model directory present'
+          for root in (Path('/app'), Path('/opt/venv'), Path('/home/aegis')):
+              for pattern in ('*.onnx', '*.safetensors', 'pytorch_model*.bin', '*.pt'):
+                  assert not any(root.rglob(pattern)), 'Model weights present'
+          print('Lite app imports offline; NER defaults off; no ML packages, metadata requirements or model weights')
+          PY
       - name: Start standalone playground profile
         run: docker compose up --detach --no-build --wait --wait-timeout 180
       - name: Scrub through the host loopback port
