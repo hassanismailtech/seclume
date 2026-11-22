@@ -21,13 +21,32 @@ docker compose --env-file deploy/.env -f deploy/compose.playground.yml config --
 caddy validate --envfile deploy/.env --config deploy/Caddyfile --adapter caddyfile
 ```
 
-The container image must already exist or be built using the README's `SECLUME_IMAGE` instructions. Validation alone does not prove networking, health, DNS or TLS. The CI profile uses native Redis plus verified Caddy for tests, and separately starts the isolated Compose stack for a real synthetic scrub request. Unexecuted CI remains unverified.
+Select the lite image described below for this profile. Validation alone does not prove networking, health, DNS or TLS. Backend CI uses native Redis plus verified Caddy for tests, and the container jobs separately start the isolated Compose stack for a real synthetic scrub request. Unexecuted CI remains unverified.
+
+## Lite image selection and checks
+
+The standalone playground profile builds the Dockerfile's `lite` target. It defaults to `NER_ENABLED=false`: pattern rules and the Nigerian name gazetteer remain available, but GLiNER detection is unavailable. Setting NER back to true does not install a model or its dependencies. Use the existing `runtime` target for enabled NER; it remains the default Docker build target and retains its model warm-up and baked cache.
+
+The independent lite builder exports the frozen lockfile without the GLiNER, Torch, Transformers, ONNX, ONNX Runtime and protobuf dependency branches. It installs the remaining pinned requirements with hash checking. Its temporary manifest generates matching `aegis` package metadata; the repository manifest and lockfile are unchanged. The lite image copies the name gazetteer rather than the whole data directory, so local ONNX exports and audit files are excluded. It retains the startup guard, non-root user, entrypoint and readiness healthcheck. This image choice adds no playground Telemetry Events or Upstream calls.
+
+To review a local build with the configured origin already in the untracked environment file:
+
+```sh
+export SECLUME_IMAGE=aegis:playground-lite-local
+docker compose --env-file deploy/.env -f deploy/compose.playground.yml config --quiet
+docker compose --env-file deploy/.env -f deploy/compose.playground.yml build aegis
+docker image inspect --format '{{.Size}}' "$SECLUME_IMAGE"
+```
+
+For a reviewed published image, set `SECLUME_IMAGE` to its verified lite digest and use `up --no-build` in the separately authorized deployment. Do not rebuild over a published digest reference. The publish workflow prepares both image families under `ghcr.io/${github.repository}`: existing full-image tags remain, while lite tags receive `-lite` (for example `main-lite`, `latest-lite`, `v0.4.0-lite` and `sha-<commit>-lite`). These are tag conventions, not evidence that any particular version has been published. Both targets keep the existing amd64/arm64 platform selection and use separate build caches. Publication triggers remain separate from CI gates.
+
+The `playground-networking` CI job builds the actual lite target, prints its Docker image size in bytes, and fails if Torch or the other omitted ML distributions/modules remain, if package metadata still requires them, or if Hugging Face caches/ONNX exports/model weights are present. It imports the application offline and checks the image's NER default, then starts the real Redis-backed lifespan through Compose health waiting and sends a host-port scrub request. The `containers` job also builds and exercises lite for its isolated playground check while retaining the full-runtime startup refusal and development-stack health checks. No registry login or publication is added to either CI job. Size and runtime results must be recorded from an executed job; there is no claimed size or build-time improvement before measurement, and CI does not exercise the arm64 publication build.
 
 ## Host-port networking verification
 
 The `playground-networking` CI job checks the standalone profile from the Ubuntu runner host. Unlike the existing in-container request, it sends a bounded curl POST through `http://127.0.0.1:8000/v1/playground/scrub`, using the existing synthetic `p01` fixture. It requires HTTP 200, lite-mode JSON with Placeholders, no planted originals anywhere in the response, and no playground Telemetry Events. Request text and response bodies are not printed in the job output.
 
-The job builds the existing runtime target under `SECLUME_IMAGE`, records Docker/Compose versions, validates the profile, waits for container health and always removes its test stack. It checks both configured and effective Proxy port bindings, verifies Redis has no published bindings and joins only the private network, and requires the host's `127.0.0.1:6379` to refuse connections. Test ports must be free before startup so an unrelated service cannot satisfy a probe. This checks host loopback publishing, not isolation from a host administrator accessing container addresses directly.
+The job builds the lite target under `SECLUME_IMAGE`, records Docker/Compose versions, validates the profile, waits for container health and always removes its test stack. It checks both configured and effective Proxy port bindings, verifies Redis has no published bindings and joins only the private network, and requires the host's `127.0.0.1:6379` to refuse connections. Test ports must be free before startup so an unrelated service cannot satisfy a probe. This checks host loopback publishing, not isolation from a host administrator accessing container addresses directly.
 
 The Proxy joins both `private` and `default`; Redis joins only `private`, which has `internal: true`. Only `127.0.0.1:8000:8000` is published. The default network enables host-port publishing for the Proxy and permits its normal outbound networking; this profile does not promise Proxy egress isolation. Redis has no published port, persistence or volume.
 

@@ -1,5 +1,84 @@
 # syntax=docker/dockerfile:1.7
 
+FROM python:3.12-slim-bookworm AS lite-builder
+
+COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /uvx /bin/
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv export --frozen --no-dev --no-emit-project \
+      --prune gliner --prune torch --prune transformers \
+      --prune onnx --prune onnxruntime --prune protobuf \
+      --output-file /tmp/lite-requirements.txt \
+    && uv venv /opt/venv \
+    && uv pip install --python /opt/venv/bin/python --require-hashes \
+      --requirements /tmp/lite-requirements.txt
+
+COPY app ./app
+COPY packs ./packs
+# Project metadata must describe the lite dependencies too. Only this build-stage
+# copy changes; the repository manifest and lockfile remain the full installation.
+RUN python - <<'PY'
+import json
+import re
+import tomllib
+from pathlib import Path
+
+path = Path("pyproject.toml")
+source = path.read_text()
+excluded = {"gliner", "torch", "transformers", "onnx", "onnxruntime", "protobuf"}
+project = tomllib.loads(source)["project"]
+remaining = [item for item in project["dependencies"] if re.split(r"[<>=!~\[; ]", item, 1)[0] not in excluded]
+source = re.sub(r"(?m)^dependencies = \[\n.*?^\]", lambda _: "dependencies = " + json.dumps(remaining), source, count=1, flags=re.S)
+assert tomllib.loads(source)["project"]["dependencies"] == remaining
+path.write_text(source)
+PY
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv build --wheel --out-dir /dist \
+    && uv pip install --python /opt/venv/bin/python --no-deps /dist/*.whl \
+    && uv pip check --python /opt/venv/bin/python
+
+FROM python:3.12-slim-bookworm AS lite
+
+COPY --from=lite-builder /opt/venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    HOME=/home/aegis \
+    HF_HOME=/home/aegis/.cache/huggingface \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    NER_ENABLED=false
+
+WORKDIR /app
+COPY app ./app
+COPY packs ./packs
+COPY data/ng_names.json ./data/ng_names.json
+COPY scripts ./scripts
+
+RUN groupadd --system aegis \
+    && useradd --system --gid aegis --create-home aegis \
+    && printf '#!/bin/sh\nexec python -m app.cli "$@"\n' > /usr/local/bin/aegis \
+    && chmod 0755 /usr/local/bin/aegis \
+    && chown -R aegis:aegis /home/aegis /app
+
+COPY --chmod=0755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
+
+USER aegis
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=6 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=4)"
+
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
+
 FROM python:3.12-slim-bookworm AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /uvx /bin/
