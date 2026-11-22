@@ -1,4 +1,4 @@
-// Run after building both apps; environment values must match the builds.
+// Build each tested app first; environment values must match its build.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -25,10 +25,20 @@ async function serve(t, directory, port) {
 
 test("built website uses configured origins and contacts across public routes", async t => {
   const base = await serve(t, "../", 3311);
-  for (const path of ["/", "/product/proxy", "/playground", "/company/contact", "/trust/security", "/legal/privacy"]) {
+  for (const path of ["/", "/product/proxy", "/playground", "/company/about", "/company/contact", "/trust/security", "/legal/privacy"]) {
     const response = await fetch(base + path);
     assert.equal(response.status, 200, path);
     const html = await response.text();
+    const footer = html.match(/<footer\b[^>]*>([\s\S]*?)<\/footer>/)?.[1];
+    assert.ok(footer?.replace(/<[^>]*>/g, "").includes("Independently maintained."), `maintenance footer ${path}`);
+    assert.equal(/seclume\.space|github\.com\/seclume\/seclume|not affiliated/i.test(footer), false, path);
+    if (path === "/company/about") {
+      const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
+      const visible = main?.replace(/<[^>]*>/g, "");
+      assert.ok(visible?.includes("Independently maintained."));
+      assert.ok(visible.includes("Maintained by Hassan Ismail (hassanismailtech)."));
+      assert.equal(/seclume\.space|github\.com\/seclume\/seclume|not affiliated/i.test(main), false);
+    }
     assert.ok(html.includes(BRAND_NAME), path);
     assert.ok(html.includes('<title>') && html.match(/<title>([^<]+)<\/title>/)[1].includes(PRODUCT_NAME), `product title ${path}`);
     const ogTitle = html.match(/<meta property="og:title" content="([^"]+)"/);

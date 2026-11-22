@@ -1,4 +1,4 @@
-import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from "@/lib/brand.mjs";
+import { PRODUCT_NAME, PRODUCT_DESCRIPTION, MAINTENANCE_NOTE } from "@/lib/brand.mjs";
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
 
@@ -26,6 +26,7 @@ export function SiteFooter() {
           ))}
         </div>
         <p className="mt-10 max-w-2xl text-sm leading-6 text-muted-foreground">{PRODUCT_DESCRIPTION}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{MAINTENANCE_NOTE}</p>
         <div className="mt-6 flex flex-col gap-5 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="inline-flex items-center gap-2"><BrandMark className="size-6" />{PRODUCT_NAME} · open source · Apache-2.0</span>
           <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Legal navigation">
