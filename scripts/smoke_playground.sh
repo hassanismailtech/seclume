@@ -116,6 +116,7 @@ EOF
 }
 
 no_store() {
+    case "$cache" in *'"'*|*'\'*) return 1;; esac
     directives=$cache
     while [ -n "$directives" ]; do
         value=${directives%%,*}; trim
@@ -261,6 +262,7 @@ forged_check() {
         for address in 192.0.2.1 192.0.2.2 192.0.2.3; do
             request POST "$path" "$origin" "$address" && [ -n "$window" ] || return 1
             if [ "$window" != "$limited_window" ]; then
+                [ "$restarts" -lt 2 ] || return 1
                 [ "$status" = 200 ] && scrub_contract && establish_limit || return 1
                 restarts=$((restarts + 1)); restart=1; break
             fi
