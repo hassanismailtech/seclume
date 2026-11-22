@@ -18,10 +18,16 @@ def test_playground_compose_is_isolated() -> None:
     config = yaml.safe_load((ROOT / "deploy/compose.playground.yml").read_text())
     assert set(config["services"]) == {"aegis", "redis"}
     redis, proxy = (config["services"][key] for key in ("redis", "aegis"))
+    assert redis["networks"] == ["private"]
+    assert proxy["networks"] == ["private", "default"]
+    assert set(config["networks"]) == {"private", "default"}
+    assert not config["networks"]["default"].get("internal", False)
     assert "ports" not in redis and "volumes" not in redis
     assert redis["command"] == ["redis-server", "--save", "", "--appendonly", "no"]
     assert redis["tmpfs"] == ["/data"]
     assert proxy["ports"] == ["127.0.0.1:8000:8000"]
+    assert "network_mode" not in proxy and "network_mode" not in redis
+    assert "volumes" not in config
     assert proxy["read_only"] and proxy["tmpfs"] == ["/tmp"]
     assert "${SECLUME_IMAGE:?" in proxy["image"]
     env = proxy["environment"]

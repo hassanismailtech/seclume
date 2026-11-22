@@ -23,6 +23,18 @@ caddy validate --envfile deploy/.env --config deploy/Caddyfile --adapter caddyfi
 
 The container image must already exist or be built using the README's `SECLUME_IMAGE` instructions. Validation alone does not prove networking, health, DNS or TLS. The CI profile uses native Redis plus verified Caddy for tests, and separately starts the isolated Compose stack for a real synthetic scrub request. Unexecuted CI remains unverified.
 
+## Host-port networking verification
+
+The `playground-networking` CI job checks the standalone profile from the Ubuntu runner host. Unlike the existing in-container request, it sends a bounded curl POST through `http://127.0.0.1:8000/v1/playground/scrub`, using the existing synthetic `p01` fixture. It requires HTTP 200, lite-mode JSON with Placeholders, no planted originals anywhere in the response, and no playground Telemetry Events. Request text and response bodies are not printed in the job output.
+
+The job builds the existing runtime target under `SECLUME_IMAGE`, records Docker/Compose versions, validates the profile, waits for container health and always removes its test stack. It checks both configured and effective Proxy port bindings, verifies Redis has no published bindings and joins only the private network, and requires the host's `127.0.0.1:6379` to refuse connections. Test ports must be free before startup so an unrelated service cannot satisfy a probe. This checks host loopback publishing, not isolation from a host administrator accessing container addresses directly.
+
+The Proxy joins both `private` and `default`; Redis joins only `private`, which has `internal: true`. Only `127.0.0.1:8000:8000` is published. The default network enables host-port publishing for the Proxy and permits its normal outbound networking; this profile does not promise Proxy egress isolation. Redis has no published port, persistence or volume.
+
+The [Q2 baseline job](https://github.com/hassanismailtech/seclume/actions/runs/44993515789/job/137119529686) tested the original internal-only topology on Ubuntu 24.04, Docker 28.0.4 and Compose 2.38.2. Redis and the Proxy became healthy, but the runner-host curl failed with exit 7 (connection refused). This is why the default network was added to the Proxy; the previous in-container request did not cover that failure.
+
+Local Compose configuration and static configuration tests can run without a Docker daemon; the host-port request and effective binding checks require a running engine. Local Docker is unavailable for this task, so runtime evidence must come from the PR's CI job before networking verification can be claimed. This test does not verify public ingress, DNS, TLS, hosting or deployment.
+
 ## Before any later launch
 
 - Obtain authorization and an exact commit/image that passes the release gates. Use a host whose location and access controls have been reviewed; never place a real provider key on the public demo host.

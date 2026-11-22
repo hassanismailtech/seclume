@@ -128,6 +128,88 @@ jobs:
           docker compose down --remove-orphans
           CORS_ORIGINS=http://localhost:3000 docker compose \
             -f deploy/compose.playground.yml -p aegis-playground-ci down --remove-orphans
+  playground-networking:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions: { contents: read }
+    defaults:
+      run: { shell: bash }
+    env:
+      SECLUME_IMAGE: aegis:playground-networking-${{ github.sha }}
+      CORS_ORIGINS: http://localhost:3000
+      COMPOSE_FILE: deploy/compose.playground.yml
+      COMPOSE_PROJECT_NAME: aegis-playground-networking-ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record Docker versions and validate profile
+        run: |
+          docker version
+          docker compose version
+          docker compose config --quiet
+          python3 - <<'PY'
+          import errno
+          import socket
+          for port in (8000, 6379):
+              with socket.socket() as connection:
+                  connection.settimeout(2)
+                  assert connection.connect_ex(('127.0.0.1', port)) == errno.ECONNREFUSED, 'Test port is not free'
+          print('Host test ports are free')
+          PY
+      - name: Build local runtime image
+        run: docker build --target runtime --tag "$SECLUME_IMAGE" backend
+      - name: Start standalone playground profile
+        run: docker compose up --detach --no-build --wait --wait-timeout 180
+      - name: Scrub through the host loopback port
+        run: |
+          status=$(python3 -c "import json,sys; print(json.dumps({'text':json.load(sys.stdin)[0]['text']}))" \
+            < demo/prompts.json | curl --fail --silent --show-error \
+            --connect-timeout 5 --max-time 15 \
+            --header 'Content-Type: application/json' --data-binary @- \
+            --output "$RUNNER_TEMP/playground-response.json" --write-out '%{http_code}' \
+            http://127.0.0.1:8000/v1/playground/scrub)
+          test "$status" = 200
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+          fixture = json.loads(Path('demo/prompts.json').read_text())[0]
+          response = json.loads((Path(os.environ['RUNNER_TEMP']) / 'playground-response.json').read_text())
+          assert response['mode'] == 'lite' and 'reinjected_reply' not in response
+          assert re.search(r'\[\[[A-Z_]+_\d+\]\]', response['scrubbed'])
+          assert all(value not in json.dumps(response) for value in fixture['planted'])
+          print('Host playground POST returned 200 with scrubbed-only JSON')
+          PY
+      - name: Verify published bindings and private Redis
+        run: |
+          redis_id=$(docker compose ps --quiet redis)
+          proxy_id=$(docker compose ps --quiet aegis)
+          test -n "$redis_id" && test -n "$proxy_id"
+          docker inspect "$redis_id" "$proxy_id" > "$RUNNER_TEMP/playground-containers.json"
+          python3 - <<'PY'
+          import errno
+          import json
+          import os
+          import socket
+          from pathlib import Path
+          redis, proxy = json.loads((Path(os.environ['RUNNER_TEMP']) / 'playground-containers.json').read_text())
+          assert not redis['HostConfig']['PortBindings']
+          assert not any((redis['NetworkSettings']['Ports'] or {}).values())
+          expected = {'8000/tcp': [{'HostIp': '127.0.0.1', 'HostPort': '8000'}]}
+          assert proxy['HostConfig']['PortBindings'] == expected
+          assert proxy['NetworkSettings']['Ports'] == expected
+          assert set(redis['NetworkSettings']['Networks']) == {os.environ['COMPOSE_PROJECT_NAME'] + '_private'}
+          assert set(proxy['NetworkSettings']['Networks']) == {os.environ['COMPOSE_PROJECT_NAME'] + suffix for suffix in ('_private', '_default')}
+          with socket.socket() as connection:
+              connection.settimeout(2)
+              assert connection.connect_ex(('127.0.0.1', 6379)) == errno.ECONNREFUSED, 'Host Redis port is reachable or probe failed'
+          print('Proxy publishes only 127.0.0.1:8000; Redis has no published port and host port 6379 refuses connections')
+          PY
+          test "$(docker compose exec -T redis redis-cli exists aegis:events aegis:stats)" = "0"
+          echo 'Playground emitted no Telemetry Events'
+      - name: Remove playground test containers
+        if: always()
+        run: docker compose down --remove-orphans
   frontend:
     runs-on: ubuntu-latest
     steps:
