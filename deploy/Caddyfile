@@ -7,6 +7,29 @@
 }
 
 {$PLAYGROUND_HOST} {
+	@health {
+		path /healthz
+		method GET
+	}
+	handle @health {
+		header Cache-Control no-store
+		reverse_proxy 127.0.0.1:8000 {
+			method GET
+			rewrite /readyz?
+			header_up -Authorization
+			header_up -Cookie
+			header_up -X-Upstream-*
+			header_up -X-Aegis-*
+			transport http {
+				dial_timeout 2s
+				response_header_timeout 5s
+			}
+			handle_response {
+				respond "" {rp.status_code}
+			}
+		}
+	}
+
 	@playground {
 		path /v1/playground/scrub
 		method POST OPTIONS

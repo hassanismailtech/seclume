@@ -59,6 +59,7 @@ request() {
         --include --write-out '\nSMOKE_STATUS:%{http_code}' \
         --request "$method" --url "$base$target" --header "Origin: $request_origin"
     case "$method" in
+        HEAD) set -- "$@" --head;;
         POST) if [ "$target" = "$path" ]; then data=$payload; else data='{}'; fi
               set -- "$@" --header 'Content-Type: application/json' --data-binary "$data";;
         OPTIONS) set -- "$@" --header 'Access-Control-Request-Method: POST' --header 'Access-Control-Request-Headers: content-type';;
@@ -299,4 +300,18 @@ else report 'FAIL limit: scrub unavailable, prior quota use, rollover budget, tr
 if [ "$limited" -eq 1 ] && forged_check; then
     report 'PASS forwarded: three forged X-Forwarded-For values still receive 429'
 else report 'FAIL forwarded: limit not established, window inconclusive, transport or forwarded-header bypass'; fi
+
+if request GET /healthz "$origin" && [ "$status" = 200 ] && [ -z "$body" ] && no_store; then
+    report 'PASS health: GET /healthz returns empty 200 with no-store'
+else report 'FAIL health: transport, readiness status, response body or cache headers'; fi
+
+private=1
+for private_path in /readyz /metrics /docs /openapi.json /v1/aegis/events /v1/aegis/stats /v1/aegis/wiretap/private; do
+    request GET "$private_path" "$origin" && [ "$status" = 404 ] || private=0
+done
+for private_method in HEAD POST OPTIONS PUT PATCH DELETE; do
+    request "$private_method" /healthz "$origin" && [ "$status" = 404 ] || private=0
+done
+if [ "$private" -eq 1 ]; then report 'PASS private: readiness, metrics, docs and operational paths stay blocked; health is GET-only'
+else report 'FAIL private: transport failure or a private path/method did not return 404'; fi
 exit "$failures"
