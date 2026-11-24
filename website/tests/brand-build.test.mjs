@@ -7,6 +7,7 @@ import { setTimeout } from "node:timers/promises";
 import { BRAND_NAME, PRODUCT_NAME, PRODUCT_DESCRIPTION, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
 import { contacts } from "../lib/contacts.mjs";
 import { siteUrl as dashboardSiteUrl } from "../../frontend/lib/brand.mjs";
+import { hasMojibake } from "./text-encoding.mjs";
 
 async function serve(t, directory, port) {
   const child = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], {
@@ -45,6 +46,10 @@ test("built website uses configured origins and contacts across public routes", 
     assert.ok(ogTitle && ogTitle[1].includes(PRODUCT_NAME), `product Open Graph title ${path}`);
     assert.ok(html.includes(`<meta property="og:site_name" content="${PRODUCT_NAME}"`), path);
     if (path === "/") {
+      const flow = html.match(/<figure\b[^>]*aria-label="Request and response flow"[\s\S]*?<\/figure>/)?.[0];
+      assert.ok(flow?.includes("<ol"), "ordered request/response flow");
+      for (const label of ["Agent", BRAND_NAME, "Scrubber", "Session Map", "Wire Tap", "Upstream", "Reinjector", "Request with identifiers", "Reply with Placeholders"]) assert.ok(flow.includes(label), label);
+      assert.ok(html.includes("\u20A650,000"), "correct naira symbol");
       assert.ok(html.includes(`<meta name="description" content="${PRODUCT_DESCRIPTION}"`));
       assert.ok(html.includes(`<meta property="og:description" content="${PRODUCT_DESCRIPTION}"`));
       const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "");
@@ -71,6 +76,16 @@ test("built website uses configured origins and contacts across public routes", 
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
   assert.ok(locations.length > 1);
   for (const location of locations) assert.equal(new URL(location).origin, siteUrl());
+  const paths = [...new Set(locations.map(location => new URL(location).pathname))];
+  for (let offset = 0; offset < paths.length; offset += 4) {
+    await Promise.all(paths.slice(offset, offset + 4).map(async path => {
+      const response = await fetch(base + path);
+      assert.equal(response.status, 200, path);
+      assert.match(response.headers.get("content-type"), /charset=utf-8/i, path);
+      assert.equal(hasMojibake(await response.text()), false, `Rendered encoding ${path}`);
+    }));
+  }
+  t.diagnostic(`Checked UTF-8 rendering on all ${paths.length} sitemap pages`);
   const security = await (await fetch(base + "/.well-known/security.txt")).text();
   assert.ok(security.includes(`Contact: mailto:${contacts().security}\n`));
   assert.ok(security.includes(`Contact: ${GITHUB_URL}/security/advisories/new\n`));

@@ -2,6 +2,16 @@
 
 ## ASSUMPTIONS
 
+### Homepage rendering repair (2026-11-24)
+
+- The user reported corrupted text in the homepage flow block and authorized an immediate fix plus a scan for similar errors. Use `codex/fix-site-encoding` from clean origin/main `e7ac2e5` (merged XQ2). This is a rendering/encoding repair, with no product-claim, protocol-identifier, dependency, backend, deployment, PRD or LICENSE change.
+- The source scan found legacy-decoded UTF-8 in the flow connectors and the hero's naira symbol. Replace text-drawn connectors with existing Lucide SVG arrows in a labelled figure/ordered list, and render the naira symbol using an ASCII numeric HTML entity. Preserve the existing flow wording and proper Unicode elsewhere.
+- Add a test-only encoding detector with valid/corrupted Unicode cases, a strict UTF-8 source scan across both web apps, and production HTTP checks for the corrected flow/currency plus all sitemap pages. Failures report only file/route identifiers and booleans, never page bodies. Inspect desktop/mobile and dark mode through the browser after building. No account, hosting or publication action is included; use a DCO-signed task commit/PR and stop after the repair report.
+
+
+- Local verification: `npm --prefix website test` passed 46 tests (0 failed/skipped; final run 2392.7339 ms); `npm --prefix website run lint` exited 0; `npm --prefix website run build` compiled successfully and generated 72/72 static pages. The production HTTP test passed (1 test, 0 failed/skipped; final run 5009.2769 ms), including all 65 sitemap pages returning 200 with UTF-8 content and no detected corruption. Claims lint passed. Existing Node module-type warnings remain; no warning suppression or dependency change was added.
+- Browser verification used the local production build at 1280x900, 390x844 and 768x1024, including light/dark mode. The flow figure had matching client/scroll widths (589/589, 343/343 and 705/705); the phone/tablet page widths also matched. Saved desktop/mobile/dark screenshots outside Git under the local Codex visualizations directory. Restored light mode, reset the viewport, closed the temporary tab and stopped the preview server. Source and rendered-text checks are automated; visual inspection covered the repaired block, not a manual review of every page. CI and the live deployment are not verified by these local checks.
+
 ### Q9: predeploy gate report (2026-11-22)
 
 - The user authorized Q9 after Q8. Start `codex/q9-predeploy-report` from clean origin/main `86c86b11e00cfcaefd3fcf0b02d97c1f68322a4d`, containing merged Q8 PR #69. Scope is docs/predeploy-report.md and these notes. Record evidence and gaps; do not repair unrelated test portability, change runtime/configuration/dependencies, rename identifiers, mark release authorization complete or start another task.
