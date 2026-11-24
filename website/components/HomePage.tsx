@@ -4,6 +4,7 @@ import { BRAND_NAME, PRODUCT_NAME, PRODUCT_DESCRIPTION, GITHUB_URL } from "@/lib
 
 import Link from "next/link";
 import {
+  ArrowDown,
   ArrowRight,
   Check,
   Container,
@@ -115,7 +116,7 @@ export default function HomePage() {
           <pre className="overflow-x-auto p-5 font-mono text-xs leading-6 sm:p-7 sm:text-sm">
             <code>
               <span className="text-muted-foreground"># What the external model receives (Wire Tap){"\n"}</span>
-              <span className="text-foreground">+ Transfer â‚¦50,000 to [[PERSON_1]], BVN [[BVN_1]], phone [[PHONE_1]]{"\n"}</span>
+              <span className="text-foreground">+ Transfer &#8358;50,000 to [[PERSON_1]], BVN [[BVN_1]], phone [[PHONE_1]]{"\n"}</span>
             </code>
           </pre>
         </div>      </section>
@@ -151,22 +152,32 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="overflow-x-auto rounded-xl bg-card p-6 font-sans text-sm leading-8 text-foreground ring-1 ring-border sm:p-8">
-              <div className="min-w-0">
-                <p className="text-primary">Agent</p>
-                <p className="text-muted-foreground">  â”‚ request with identifiers</p>
-                <p className="text-primary">  â–¼</p>
-                <p className="text-foreground">{BRAND_NAME}</p>
-                <p className="text-muted-foreground">  â”œâ”€ Scrubber â†’ Placeholders</p>
-                <p className="text-muted-foreground">  â”œâ”€ Session Map â†’ Redis, short expiry</p>
-                <p className="text-muted-foreground">  â””â”€ Wire Tap â†’ post-scrub evidence</p>
-                <p className="text-primary">  â–¼</p>
-                <p className="text-foreground">Upstream</p>
-                <p className="text-muted-foreground">  â”‚ reply with Placeholders</p>
-                <p className="text-primary">  â–¼</p>
-                <p className="text-foreground">Reinjector â†’ Agent</p>
-              </div>
-            </div>
+            <figure aria-label="Request and response flow" className="min-w-0 rounded-xl bg-card p-6 font-sans text-sm leading-6 text-foreground ring-1 ring-border sm:p-8">
+              <ol className="space-y-4">
+                <li>
+                  <p className="font-medium text-primary">Agent</p>
+                  <p className="mt-1 text-muted-foreground">Request with identifiers</p>
+                </li>
+                <li>
+                  <ArrowDown aria-hidden="true" className="mb-3 size-4 text-primary" />
+                  <p className="font-medium">{BRAND_NAME}</p>
+                  <ul className="mt-2 space-y-2 border-l border-border pl-4 text-muted-foreground">
+                    <li className="flex flex-wrap items-center gap-x-2"><span>Scrubber</span><ArrowRight aria-hidden="true" className="size-3 shrink-0 text-primary" /><span>Placeholders</span></li>
+                    <li className="flex flex-wrap items-center gap-x-2"><span>Session Map</span><ArrowRight aria-hidden="true" className="size-3 shrink-0 text-primary" /><span>Redis, short expiry</span></li>
+                    <li className="flex flex-wrap items-center gap-x-2"><span>Wire Tap</span><ArrowRight aria-hidden="true" className="size-3 shrink-0 text-primary" /><span>post-scrub evidence</span></li>
+                  </ul>
+                </li>
+                <li>
+                  <ArrowDown aria-hidden="true" className="mb-3 size-4 text-primary" />
+                  <p className="font-medium">Upstream</p>
+                  <p className="mt-1 text-muted-foreground">Reply with Placeholders</p>
+                </li>
+                <li>
+                  <ArrowDown aria-hidden="true" className="mb-3 size-4 text-primary" />
+                  <p className="flex flex-wrap items-center gap-x-2 font-medium"><span>Reinjector</span><ArrowRight aria-hidden="true" className="size-3 shrink-0 text-primary" /><span>Agent</span></p>
+                </li>
+              </ol>
+            </figure>
           </div>
         </div>
       </section>

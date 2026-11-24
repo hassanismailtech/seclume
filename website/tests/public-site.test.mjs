@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { BRAND_NAME, PRODUCT_NAME, PRODUCT_DESCRIPTION, GITHUB_URL, siteUrl } from "../lib/brand.mjs";
 import { contacts } from "../lib/contacts.mjs";
@@ -9,6 +9,32 @@ import { marketingPaths, sitePages } from "../lib/site-content.ts";
 import { applyTheme, readTheme, themeBootstrap, THEME_KEY } from "../lib/theme.ts";
 import { runInNewContext } from "node:vm";
 import { proxy } from "../proxy.ts";
+import { hasMojibake } from "./text-encoding.mjs";
+
+test("encoding checks distinguish real Unicode from corrupted arrows, currency and replacement characters", () => {
+  for (const value of ["\u20A650,000", "\u2192", "\u2502", "\u251C\u2500", "\u2014"]) assert.equal(hasMojibake(value), false);
+  for (const value of ["\u00E2\u201A\u00A6", "\u00E2\u2020\u2019", "\u00E2\u201D\u201A", "\u00E2\u2013\u00BC", "\u00C3\u00A9", "\u00C2\u00A0", "\u00F0\u0178", "\u00EF\u00BB\u00BF", "\uFFFD"]) assert.equal(hasMojibake(value), true);
+});
+
+test("website and dashboard source text is valid UTF-8 without mojibake", async () => {
+  const ignored = new Set(["node_modules", ".next", ".git", ".vercel", "dist", "out", "build", "coverage"]);
+  const textFile = /\.(?:[cm]?jsx?|tsx?|css|mdx?|json|svg|html|txt)$/;
+  async function inspect(directory, label) {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const path = new URL(entry.name + (entry.isDirectory() ? "/" : ""), directory);
+      const name = `${label}/${entry.name}`;
+      if (entry.isDirectory() && !ignored.has(entry.name)) await inspect(path, name);
+      else if (entry.isFile() && textFile.test(entry.name) && entry.name !== "package-lock.json") {
+        let text;
+        try { text = new TextDecoder("utf-8", { fatal: true }).decode(await readFile(path)); }
+        catch { assert.fail(`Invalid UTF-8 in ${name}`); }
+        assert.equal(hasMojibake(text), false, `Corrupted text in ${name}`);
+      }
+    }
+  }
+  await inspect(new URL("../", import.meta.url), "website");
+  await inspect(new URL("../../frontend/", import.meta.url), "frontend");
+});
 
 function themeRoot() {
   let dark = false;
